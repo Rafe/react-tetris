@@ -3,8 +3,6 @@ import create from "zustand"
 import shallow from "zustand/shallow"
 import styled from "styled-components"
 
-import './App.css';
-
 enum GameState {
   START,
   PAUSE,
@@ -12,22 +10,24 @@ enum GameState {
 }
 
 interface State {
-  score: number
-  line: number
   gameState: GameState
+  level: number
+  line: number
+  score: number
+
   matrix: any[][]
   pieceQueue: any[]
-  piece: any[][]
-  level: number
+  currentPiece: {
+    type: string,
+    position: number[]
+    piece: any
+  }
+
   addScore: (added: number) => void
   gameLoop: () => any
 }
 
 const LINES_EACH_LEVEL = 20
-
-// initialize game state:
-// { score, line, gameState: START | PAUSE | GAME_OVER,
-//   matrix, nextPieceQueue, currentPiece }
 
 // when game state is GAME_OVER or PAUSE, press start to start the game
 // when game state is START, running game loop 
@@ -43,7 +43,7 @@ const LINES_EACH_LEVEL = 20
 const MATRIX_WIDTH = 10
 const MATRIX_HEIGHT = 20
 
-const pieces : any = {
+const PIECES : any = {
   I: [
     [
       [0, 1, 0, 0],
@@ -230,8 +230,8 @@ const pieces : any = {
 
 // const pieceTypes = Object.keys(pieces)
 // const getPieceType = () => pieceTypes[Math.floor(Math.random() * 7)]
-const getPiece = (type) => pieces[type][0]
-const getCurrentPiece = (type) => ({
+const getPiece = (type: string) => PIECES[type][0]
+const getCurrentPiece = (type: string) => ({
   type,
   position: [0, 0],
   piece: getPiece(type),
@@ -240,22 +240,30 @@ const getCurrentPiece = (type) => ({
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
 
-const useGame = create<State>(set => ({
-  score: 0,
-  line: 0,
+const useGame = create<State>((set, get) => ({
   gameState: GameState.START,
+  level: 1,
+  line: 0,
+  score: 0,
+
   matrix: buildMatrix(),
   currentPiece: getCurrentPiece("I"),
-  pieceQueue: [getPiece(), getPiece(), getPiece(), getPiece()],
-  level: 1,
+  pieceQueue: [],
+
   addScore(added: number) {
     set(state => ({ score: state.score + added }))
   },
   gameLoop() {
     const ref = setInterval(() => {
+      // move current piece
       console.log("tick")
-    }, 1000)
 
+      // check lock
+
+      // if piece is locked, clear line, add score, update level
+    }, get().level * 1000)
+
+    // return clear up function when gameLoop changed
     return () => clearInterval(ref)
   }
 }))
@@ -295,12 +303,9 @@ function App() {
     gameState,
     gameLoop,
     level,
-    piece,
   } = useGame(state => state , shallow)
 
-  useEffect(gameLoop, [gameState, level])
-
-  console.log(piece)
+  useEffect(gameLoop, [gameLoop, gameState, level])
 
   return (
     <div className="App">
