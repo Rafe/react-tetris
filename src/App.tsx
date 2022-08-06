@@ -16,8 +16,8 @@ interface State {
   line: number
   gameState: GameState
   matrix: any[][]
-  pieceQueue: []
-  piece: any
+  pieceQueue: any[]
+  piece: any[][]
   level: number
   addScore: (added: number) => void
   gameLoop: () => any
@@ -43,6 +43,194 @@ const LINES_EACH_LEVEL = 20
 const MATRIX_WIDTH = 10
 const MATRIX_HEIGHT = 20
 
+const pieces : any = {
+  I: [
+    [
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0]
+    ],
+    [
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 1, 0]
+    ],
+    [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0]
+    ]
+  ],
+  L: [
+    [
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 0, 0, 0],
+      [1, 1, 1, 0],
+      [1, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [1, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 0, 1, 0],
+      [1, 1, 1, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ]
+  ],
+  J: [
+    [
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [1, 0, 0, 0],
+      [1, 1, 1, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 1, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 0, 0, 0],
+      [1, 1, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 0]
+    ]
+  ],
+  Z: [
+    [
+      [0, 0, 0, 0],
+      [1, 1, 0, 0],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 0, 0],
+      [1, 1, 0, 0],
+      [1, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [1, 1, 0, 0],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 0, 1, 0],
+      [0, 1, 1, 0],
+      [0, 1, 0, 0],
+      [0, 0, 0, 0]
+    ]
+  ],
+  S: [
+    [
+      [0, 0, 0, 0],
+      [0, 1, 1, 0],
+      [1, 1, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [1, 0, 0, 0],
+      [1, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 1, 0],
+      [1, 1, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 0, 0],
+      [0, 1, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 0]
+    ]
+  ],
+  O: [
+    [
+      [1, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [1, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [1, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [1, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ]
+  ],
+  T: [
+    [
+      [0, 0, 0, 0],
+      [1, 1, 1, 0],
+      [0, 1, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 0, 0],
+      [1, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 0, 0],
+      [1, 1, 1, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0]
+    ],
+    [
+      [0, 1, 0, 0],
+      [0, 1, 1, 0],
+      [0, 1, 0, 0],
+      [0, 0, 0, 0]
+    ]
+  ]
+}
+
+const pieceTypes = Object.keys(pieces)
+const getPiece = () => pieces[pieceTypes[Math.floor(Math.random() * 7)]][0]
+
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
 
@@ -51,8 +239,8 @@ const useGame = create<State>(set => ({
   line: 0,
   gameState: GameState.START,
   matrix: buildMatrix(),
-  piece: null,
-  pieceQueue: [],
+  piece: getPiece(),
+  pieceQueue: [getPiece(), getPiece(), getPiece(), getPiece()],
   level: 1,
   addScore(added: number) {
     set(state => ({ score: state.score + added }))
@@ -79,31 +267,34 @@ const MatrixTable = styled.table`
 
 const Matrix = ({matrix}: {matrix: any[][]}) => (
   <MatrixTable>
-    {
-    matrix.map(line => (
-      <tr>
-        {
-          line.map(block => (
-            <Block type={block} />
-          ))
-        }
-      </tr>
-    ))
-    }
+    <tbody>
+      {
+      matrix.map((line, i) => (
+        <tr key={`line-${i}`}>
+          {
+            line.map((block, j) => (
+              <Block key={`block-${i}-${j}`} type={block} />
+            ))
+          }
+        </tr>
+      ))
+      }
+    </tbody>
   </MatrixTable>
 )
 
 function App() {
-  const { matrix, gameState, gameLoop, level } = useGame(state => ({
-    score: state.score,
-    gameState: state.gameState,
-    matrix: state.matrix,
-    addScore: state.addScore,
-    gameLoop: state.gameLoop,
-    level: state.level,
-  }), shallow)
+  const {
+    matrix,
+    gameState,
+    gameLoop,
+    level,
+    piece,
+  } = useGame(state => state , shallow)
 
   useEffect(gameLoop, [gameState, level])
+
+  console.log(piece)
 
   return (
     <div className="App">
