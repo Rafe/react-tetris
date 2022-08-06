@@ -1,6 +1,7 @@
 import React from "react";
 import create from "zustand"
 import shallow from "zustand/shallow"
+import styled from "styled-components"
 
 import './App.css';
 
@@ -14,7 +15,7 @@ interface GameState {
   score: number
   line: number
   state: Status
-  matrix: []
+  matrix: any[][]
   pieceQueue: []
   currentPiece: []
   addScore: (added: number) => void
@@ -37,11 +38,17 @@ const LINES_EACH_LEVEL = 20
 //   while falling, controller take control of the piece
 //     left, right, down, drop, rotate right, rotate left, pause
 
+const MATRIX_WIDTH = 10
+const MATRIX_HEIGHT = 20
+
+const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
+const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
+
 const useGame = create<GameState>(set => ({
   score: 0,
   line: 0,
   state: Status.START,
-  matrix: [],
+  matrix: buildMatrix(),
   pieceQueue: [],
   currentPiece: [],
   addScore(added: number) {
@@ -49,13 +56,39 @@ const useGame = create<GameState>(set => ({
   }
 }))
 
+const Block = styled.td<{type: string}>`
+  border: 1px solid black;
+  width: 20px;
+  height: 20px;
+  background-color: ${props => props.type ? "black" : "#EEEEEE"}
+`
+
+const MatrixTable = styled.table`
+  border-collapse: collapse;
+`
+
+const Matrix = ({matrix}: {matrix: any[][]}) => (
+  <MatrixTable>
+    {
+    matrix.map(line => (
+      <tr>
+        {
+          line.map(block => (
+            <Block type={block} />
+          ))
+        }
+      </tr>
+    ))
+    }
+  </MatrixTable>
+)
+
 function App() {
-  const { score, addScore } = useGame(state => ({ score: state.score, addScore: state.addScore }), shallow)
+  const { matrix } = useGame(state => ({ score: state.score, matrix: state.matrix, addScore: state.addScore }), shallow)
   return (
     <div className="App">
       <header className="App-header">React Tetris</header>
-      <h2>{score}</h2>
-      <button onClick={() => addScore(100)}>+100</button>
+      <Matrix matrix={matrix} />
     </div>
   );
 }
