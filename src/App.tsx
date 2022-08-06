@@ -1,24 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import create from "zustand"
 import shallow from "zustand/shallow"
 import styled from "styled-components"
 
 import './App.css';
 
-enum Status {
+enum GameState {
   START,
   PAUSE,
   GAME_OVER
 }
 
-interface GameState {
+interface State {
   score: number
   line: number
-  state: Status
+  gameState: GameState
   matrix: any[][]
   pieceQueue: []
-  currentPiece: []
+  piece: any
+  level: number
   addScore: (added: number) => void
+  gameLoop: () => any
 }
 
 const LINES_EACH_LEVEL = 20
@@ -44,15 +46,23 @@ const MATRIX_HEIGHT = 20
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
 
-const useGame = create<GameState>(set => ({
+const useGame = create<State>(set => ({
   score: 0,
   line: 0,
-  state: Status.START,
+  gameState: GameState.START,
   matrix: buildMatrix(),
+  piece: null,
   pieceQueue: [],
-  currentPiece: [],
+  level: 1,
   addScore(added: number) {
     set(state => ({ score: state.score + added }))
+  },
+  gameLoop() {
+    const ref = setInterval(() => {
+      console.log("tick")
+    }, 1000)
+
+    return () => clearInterval(ref)
   }
 }))
 
@@ -84,7 +94,17 @@ const Matrix = ({matrix}: {matrix: any[][]}) => (
 )
 
 function App() {
-  const { matrix } = useGame(state => ({ score: state.score, matrix: state.matrix, addScore: state.addScore }), shallow)
+  const { matrix, gameState, gameLoop, level } = useGame(state => ({
+    score: state.score,
+    gameState: state.gameState,
+    matrix: state.matrix,
+    addScore: state.addScore,
+    gameLoop: state.gameLoop,
+    level: state.level,
+  }), shallow)
+
+  useEffect(gameLoop, [gameState, level])
+
   return (
     <div className="App">
       <header className="App-header">React Tetris</header>
