@@ -228,8 +228,14 @@ const pieces : any = {
   ]
 }
 
-const pieceTypes = Object.keys(pieces)
-const getPiece = () => pieces[pieceTypes[Math.floor(Math.random() * 7)]][0]
+// const pieceTypes = Object.keys(pieces)
+// const getPieceType = () => pieceTypes[Math.floor(Math.random() * 7)]
+const getPiece = (type) => pieces[type][0]
+const getCurrentPiece = (type) => ({
+  type,
+  position: [0, 0],
+  piece: getPiece(type),
+})
 
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
@@ -239,7 +245,7 @@ const useGame = create<State>(set => ({
   line: 0,
   gameState: GameState.START,
   matrix: buildMatrix(),
-  piece: getPiece(),
+  currentPiece: getCurrentPiece("I"),
   pieceQueue: [getPiece(), getPiece(), getPiece(), getPiece()],
   level: 1,
   addScore(added: number) {
