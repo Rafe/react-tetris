@@ -9,6 +9,12 @@ enum GameState {
   GAME_OVER
 }
 
+type CurrentPiece = {
+  type: string,
+  position: number[]
+  piece: any
+}
+
 interface State {
   gameState: GameState
   level: number
@@ -17,14 +23,11 @@ interface State {
 
   matrix: any[][]
   pieceQueue: any[]
-  currentPiece: {
-    type: string,
-    position: number[]
-    piece: any
-  }
+  currentPiece: CurrentPiece
 
   addScore: (added: number) => void
   gameLoop: () => any
+  viewMatrix: () => any[][]
 }
 
 const LINES_EACH_LEVEL = 20
@@ -231,7 +234,7 @@ const PIECES : any = {
 // const pieceTypes = Object.keys(pieces)
 // const getPieceType = () => pieceTypes[Math.floor(Math.random() * 7)]
 const getPiece = (type: string) => PIECES[type][0]
-const getCurrentPiece = (type: string) => ({
+const getCurrentPiece = (type: string): CurrentPiece => ({
   type,
   position: [0, 0],
   piece: getPiece(type),
@@ -239,6 +242,21 @@ const getCurrentPiece = (type: string) => ({
 
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
+
+const moveDown = (currentPiece: CurrentPiece) => {
+  console.log(currentPiece)
+
+  if (currentPiece) {
+    const [x, y] = currentPiece.position
+
+    return {
+      ...currentPiece,
+      position: [x + 1, y]
+    }
+  }
+
+  return currentPiece
+}
 
 const useGame = create<State>((set, get) => ({
   gameState: GameState.START,
@@ -254,17 +272,28 @@ const useGame = create<State>((set, get) => ({
     set(state => ({ score: state.score + added }))
   },
   gameLoop() {
+    console.log("gameloop started")
     const ref = setInterval(() => {
-      // move current piece
-      console.log("tick")
-
-      // check lock
+      set(state => ({ currentPiece: moveDown(state.currentPiece)}))
 
       // if piece is locked, clear line, add score, update level
     }, get().level * 1000)
 
     // return clear up function when gameLoop changed
-    return () => clearInterval(ref)
+    return () => {
+      console.log("gameloop stopped")
+      clearInterval(ref)
+    }
+  },
+  viewMatrix() {
+    const { matrix, currentPiece } = get()
+
+    const [x, y] = currentPiece.position
+    if (x < matrix.length && y < matrix[x].length) {
+      matrix[x][y] = "I"
+    }
+
+    return matrix
   }
 }))
 
@@ -299,10 +328,10 @@ const Matrix = ({matrix}: {matrix: any[][]}) => (
 
 function App() {
   const {
-    matrix,
     gameState,
     gameLoop,
     level,
+    viewMatrix
   } = useGame(state => state , shallow)
 
   useEffect(gameLoop, [gameLoop, gameState, level])
@@ -310,7 +339,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">React Tetris</header>
-      <Matrix matrix={matrix} />
+      <Matrix matrix={viewMatrix()} />
     </div>
   );
 }
