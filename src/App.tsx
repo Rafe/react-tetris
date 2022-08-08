@@ -272,28 +272,33 @@ const useGame = create<State>((set, get) => ({
     set(state => ({ score: state.score + added }))
   },
   gameLoop() {
-    console.log("gameloop started")
     const ref = setInterval(() => {
       set(state => ({ currentPiece: moveDown(state.currentPiece)}))
 
       // if piece is locked, clear line, add score, update level
     }, get().level * 1000)
 
-    // return clear up function when gameLoop changed
     return () => {
-      console.log("gameloop stopped")
       clearInterval(ref)
     }
   },
   viewMatrix() {
     const { matrix, currentPiece } = get()
 
+    const newMatrix = matrix.map(row => [...row])
+
     const [x, y] = currentPiece.position
     if (x < matrix.length && y < matrix[x].length) {
-      matrix[x][y] = "I"
+      for (let i = 0; i < currentPiece.piece.length; i++) {
+        for (let j = 0; j < currentPiece.piece[i].length; j++) {
+          if (x + i < matrix.length && y + j < matrix[0].length && currentPiece.piece[i][j]) {
+            newMatrix[x + i][y + j] = currentPiece.type
+          }
+        }
+      }
     }
 
-    return matrix
+    return newMatrix
   }
 }))
 
