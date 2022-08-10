@@ -258,6 +258,21 @@ const moveDown = (currentPiece: CurrentPiece) => {
   return currentPiece
 }
 
+const addPieceTo = (matrix, currentPiece: CurrentPiece): any[][] => {
+  const [x, y] = currentPiece.position
+  if (x < matrix.length && y < matrix[x].length) {
+    for (let i = 0; i < currentPiece.piece.length; i++) {
+      for (let j = 0; j < currentPiece.piece[i].length; j++) {
+        if (x + i < matrix.length && y + j < matrix[0].length && currentPiece.piece[i][j]) {
+          matrix[x + i][y + j] = currentPiece.type
+        }
+      }
+    }
+  }
+
+  return matrix
+}
+
 const useGame = create<State>((set, get) => ({
   gameState: GameState.START,
   level: 1,
@@ -285,20 +300,7 @@ const useGame = create<State>((set, get) => ({
   viewMatrix() {
     const { matrix, currentPiece } = get()
 
-    const newMatrix = matrix.map(row => [...row])
-
-    const [x, y] = currentPiece.position
-    if (x < matrix.length && y < matrix[x].length) {
-      for (let i = 0; i < currentPiece.piece.length; i++) {
-        for (let j = 0; j < currentPiece.piece[i].length; j++) {
-          if (x + i < matrix.length && y + j < matrix[0].length && currentPiece.piece[i][j]) {
-            newMatrix[x + i][y + j] = currentPiece.type
-          }
-        }
-      }
-    }
-
-    return newMatrix
+    return addPieceTo(matrix.map(row => [...row]), currentPiece)
   }
 }))
 
