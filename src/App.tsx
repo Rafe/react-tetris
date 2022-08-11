@@ -236,7 +236,7 @@ const PIECES : any = {
 const getPiece = (type: string) => PIECES[type][0]
 const getCurrentPiece = (type: string): CurrentPiece => ({
   type,
-  position: [0, 0],
+  position: [0, 3],
   piece: getPiece(type),
 })
 
@@ -258,7 +258,7 @@ const moveDown = (currentPiece: CurrentPiece) => {
   return currentPiece
 }
 
-const addPieceTo = (matrix, currentPiece: CurrentPiece): any[][] => {
+const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   const [x, y] = currentPiece.position
   if (x < matrix.length && y < matrix[x].length) {
     for (let i = 0; i < currentPiece.piece.length; i++) {
@@ -280,7 +280,7 @@ const useGame = create<State>((set, get) => ({
   score: 0,
 
   matrix: buildMatrix(),
-  currentPiece: getCurrentPiece("I"),
+  currentPiece: getCurrentPiece("S"),
   pieceQueue: [],
 
   addScore(added: number) {
