@@ -243,19 +243,15 @@ const getCurrentPiece = (type: string): CurrentPiece => ({
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
 
-const moveDown = (currentPiece: CurrentPiece) => {
-  console.log(currentPiece)
-
-  if (currentPiece) {
-    const [x, y] = currentPiece.position
-
-    return {
-      ...currentPiece,
-      position: [x + 1, y]
-    }
+const move = (currentPiece: CurrentPiece, func) => {
+  return {
+    ...currentPiece,
+    position: func(currentPiece.position)
   }
+}
 
-  return currentPiece
+const moveDown = (currentPiece: CurrentPiece) => {
+  return move(currentPiece, ([x, y]) => [x + 1, y])
 }
 
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
