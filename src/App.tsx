@@ -254,6 +254,14 @@ const moveDown = (currentPiece: CurrentPiece) => {
   return move(currentPiece, ([x, y]) => [x + 1, y])
 }
 
+const moveLeft = (currentPiece: CurrentPiece) => {
+  return move(currentPiece, ([x, y]) => [x, y - 1])
+}
+
+const moveRight = (currentPiece: CurrentPiece) => {
+  return move(currentPiece, ([x, y]) => [x, y + 1])
+}
+
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   const [x, y] = currentPiece.position
   if (x < matrix.length && y < matrix[x].length) {
