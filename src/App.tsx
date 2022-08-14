@@ -127,14 +127,18 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean =
 
   for(let x = 0; x < piece.length; x++) {
     for(let y = 0; y < piece[0].length; y++) {
+      if (!piece[x][y]) {
+        continue
+      }
+
       const px = position[0] + x
       const py = position[1] + y
 
-      if (px < 0 || px > MATRIX_HEIGHT) {
+      if (px < 0 || px >= MATRIX_HEIGHT) {
         return false
-      } else if (py < 0 || py > MATRIX_WIDTH) {
+      } else if (py < 0 || py >= MATRIX_WIDTH) {
         return false
-      } else if (!matrix[px][py]) {
+      } else if (matrix[px][py]) {
         return false
       }
     }
@@ -209,12 +213,23 @@ const useGame = create<State>((set, get) => ({
   },
   gameLoop() {
     const ref = setInterval(() => {
-      const {piece, position} = get().currentPiece
-      if (position[0] >= MATRIX_HEIGHT - piece.length) {
-        set(state => ({ currentPiece: getCurrentPiece(getPieceType())}))
-      } else {
-        set(state => ({ currentPiece: moveDown(state.currentPiece)}))
-      }
+      set(({matrix, currentPiece}) => {
+        const movedPiece = tryMove(moveDown, matrix)(currentPiece)
+
+        const [x, y] = currentPiece.position
+        const [mx, my] = movedPiece.position
+
+        if (mx === x && my === y) {
+          return {
+            currentPiece: getCurrentPiece(getPieceType()),
+            matrix: addPieceTo(matrix, currentPiece)
+          }
+        } else {
+          return {
+            currentPiece: movedPiece
+          }
+        }
+      })
 
       // if piece is locked, clear line, add score, update level
     }, get().level * 1000)
