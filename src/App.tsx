@@ -122,6 +122,39 @@ const moveRight = (currentPiece: CurrentPiece) => {
   return move(currentPiece, ([x, y]) => [x, y + 1])
 }
 
+const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean => {
+  const { position, piece } = currentPiece
+
+  for(let x = 0; x < piece.length; x++) {
+    for(let y = 0; y < piece[0].length; y++) {
+      const px = position[0] + x
+      const py = position[1] + y
+
+      if (px < 0 || px > MATRIX_HEIGHT) {
+        return false
+      } else if (py < 0 || py > MATRIX_WIDTH) {
+        return false
+      } else if (!matrix[px][py]) {
+        return false
+      }
+    }
+  }
+
+  return true
+}
+
+const tryMove = (moveMethod: (p: CurrentPiece) => CurrentPiece, matrix: number[][]) => {
+  return (currentPiece: CurrentPiece): CurrentPiece => {
+    const movedPiece = moveMethod(currentPiece)
+
+    if (isEmptyPosition(movedPiece, matrix)) {
+      return movedPiece
+    } else {
+      return currentPiece
+    }
+  }
+}
+
 const rotate = (currentPiece: CurrentPiece, clockwise = true): CurrentPiece => {
   const piece = currentPiece.piece
   const height = piece.length
@@ -180,7 +213,7 @@ const useGame = create<State>((set, get) => ({
       if (position[0] >= MATRIX_HEIGHT - piece.length) {
         set(state => ({ currentPiece: getCurrentPiece(getPieceType())}))
       } else {
-        set(state => ({ currentPiece: rotate(moveDown(state.currentPiece), true)}))
+        set(state => ({ currentPiece: moveDown(state.currentPiece)}))
       }
 
       // if piece is locked, clear line, add score, update level
