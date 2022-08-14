@@ -11,7 +11,7 @@ enum GameState {
 
 type CurrentPiece = {
   type: string,
-  position: number[]
+  position: [number, number]
   piece: any
 }
 
@@ -46,204 +46,64 @@ const LINES_EACH_LEVEL = 20
 const MATRIX_WIDTH = 10
 const MATRIX_HEIGHT = 20
 
-const PIECES : any = {
-  I: [
-    [
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 1, 0, 0]
-    ],
-    [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 0, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 1, 0]
-    ],
-    [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0]
-    ]
-  ],
-  L: [
-    [
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 0, 0, 0],
-      [1, 1, 1, 0],
-      [1, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [1, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 0, 1, 0],
-      [1, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ]
-  ],
-  J: [
-    [
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [1, 0, 0, 0],
-      [1, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 1, 1, 0],
-      [0, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 0, 0, 0],
-      [1, 1, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 0, 0]
-    ]
-  ],
-  Z: [
-    [
-      [0, 0, 0, 0],
-      [1, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 1, 0, 0],
-      [1, 1, 0, 0],
-      [1, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [1, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 0, 1, 0],
-      [0, 1, 1, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 0]
-    ]
-  ],
-  S: [
-    [
-      [0, 0, 0, 0],
-      [0, 1, 1, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [1, 0, 0, 0],
-      [1, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 1, 1, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 0, 1, 0],
-      [0, 0, 0, 0]
-    ]
-  ],
-  O: [
-    [
-      [1, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [1, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [1, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [1, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ]
-  ],
-  T: [
-    [
-      [0, 0, 0, 0],
-      [1, 1, 1, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 1, 0, 0],
-      [1, 1, 0, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 1, 0, 0],
-      [1, 1, 1, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ],
-    [
-      [0, 1, 0, 0],
-      [0, 1, 1, 0],
-      [0, 1, 0, 0],
-      [0, 0, 0, 0]
-    ]
-  ]
+const generatePiece = (type: string): number[][] => {
+  switch(type) {
+    case "I":
+      return [
+        [1],
+        [1],
+        [1],
+        [1],
+      ]
+    case "L":
+      return [
+        [1, 0],
+        [1, 0],
+        [1, 1],
+      ]
+    case "J":
+      return [
+        [0, 1],
+        [0, 1],
+        [1, 1],
+      ]
+    case "Z":
+      return [
+        [1, 1, 0],
+        [0, 1, 1],
+      ]
+    case "S":
+      return [
+        [0, 1, 1],
+        [1, 1, 0],
+      ]
+    case "O":
+      return [
+        [1, 1],
+        [1, 1],
+      ]
+    case "T":
+      return [
+        [1, 1, 1],
+        [0, 1, 0],
+      ]
+    default:
+      throw new Error(`invalid type ${type}`)
+  }
 }
 
-// const pieceTypes = Object.keys(pieces)
-// const getPieceType = () => pieceTypes[Math.floor(Math.random() * 7)]
-const getPiece = (type: string) => PIECES[type][0]
+const pieceTypes = ["I", "L", "J", "Z", "S", "I", "T"]
+const getPieceType = () => pieceTypes[Math.floor(Math.random() * pieceTypes.length)]
 const getCurrentPiece = (type: string): CurrentPiece => ({
   type,
   position: [0, 3],
-  piece: getPiece(type),
+  piece: generatePiece(type),
 })
 
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
 
-const move = (currentPiece: CurrentPiece, func) => {
+const move = (currentPiece: CurrentPiece, func: ([x, y]: [number, number]) => [number, number]) => {
   return {
     ...currentPiece,
     position: func(currentPiece.position)
@@ -260,6 +120,30 @@ const moveLeft = (currentPiece: CurrentPiece) => {
 
 const moveRight = (currentPiece: CurrentPiece) => {
   return move(currentPiece, ([x, y]) => [x, y + 1])
+}
+
+const rotate = (currentPiece: CurrentPiece, clockwise = true): CurrentPiece => {
+  const piece = currentPiece.piece
+  const height = piece.length
+  const width = piece[0].length
+  const newPiece = Array(width).fill(null).map(() => Array(height).fill(0))
+
+  for(let x = 0; x < height; x++) {
+    for(let y = 0; y < width; y++) {
+      if (piece[x][y]) {
+        if (clockwise) {
+          newPiece[y][(height - 1) - x] = piece[x][y]
+        } else {
+          newPiece[(width - 1) - y][x] = piece[x][y]
+        }
+      }
+    }
+  }
+
+  return {
+    ...currentPiece,
+    piece: newPiece
+  }
 }
 
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
@@ -284,7 +168,7 @@ const useGame = create<State>((set, get) => ({
   score: 0,
 
   matrix: buildMatrix(),
-  currentPiece: getCurrentPiece("S"),
+  currentPiece: getCurrentPiece(getPieceType()),
   pieceQueue: [],
 
   addScore(added: number) {
@@ -292,7 +176,12 @@ const useGame = create<State>((set, get) => ({
   },
   gameLoop() {
     const ref = setInterval(() => {
-      set(state => ({ currentPiece: moveDown(state.currentPiece)}))
+      const {piece, position} = get().currentPiece
+      if (position[0] >= MATRIX_HEIGHT - piece.length) {
+        set(state => ({ currentPiece: getCurrentPiece(getPieceType())}))
+      } else {
+        set(state => ({ currentPiece: rotate(moveDown(state.currentPiece), true)}))
+      }
 
       // if piece is locked, clear line, add score, update level
     }, get().level * 1000)
