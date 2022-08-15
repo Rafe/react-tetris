@@ -159,7 +159,7 @@ const tryMove = (moveMethod: (p: CurrentPiece) => CurrentPiece, matrix: number[]
   }
 }
 
-const rotate = (currentPiece: CurrentPiece, clockwise = true): CurrentPiece => {
+const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentPiece): CurrentPiece => {
   const piece = currentPiece.piece
   const height = piece.length
   const width = piece[0].length
@@ -183,6 +183,9 @@ const rotate = (currentPiece: CurrentPiece, clockwise = true): CurrentPiece => {
   }
 }
 
+const rotateRight = rotate({ clockwise: true })
+const rotateLeft = rotate({ clockwise: false})
+
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   const [x, y] = currentPiece.position
   if (x < matrix.length && y < matrix[x].length) {
@@ -196,6 +199,29 @@ const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   }
 
   return matrix
+}
+
+const isSamePiece = (currentPiece: CurrentPiece, movedPiece: CurrentPiece): boolean => {
+  const [x, y] = currentPiece.position;
+  const [mx, my] = movedPiece.position;
+
+  return x === mx && y === my
+}
+
+const clearLines = (matrix: any[][]): [number, any[][]] => {
+  let lineCleared = 0
+  const newMatrix = matrix.reduce((result, line) => {
+    if (line.every((block) => block)) {
+      lineCleared += 1
+      result.push(buildLine())
+    } else {
+      result.push(line)
+    }
+
+    return result
+  }, [])
+
+  return [lineCleared, newMatrix]
 }
 
 const useGame = create<State>((set, get) => ({
@@ -213,16 +239,16 @@ const useGame = create<State>((set, get) => ({
   },
   gameLoop() {
     const ref = setInterval(() => {
-      set(({matrix, currentPiece}) => {
+      set(({matrix, line, currentPiece}) => {
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
-        const [x, y] = currentPiece.position
-        const [mx, my] = movedPiece.position
+        if (isSamePiece(currentPiece, movedPiece)) {
+          const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, currentPiece))
 
-        if (mx === x && my === y) {
           return {
             currentPiece: getCurrentPiece(getPieceType()),
-            matrix: addPieceTo(matrix, currentPiece)
+            matrix: newMatrix,
+            line: line + lineCleared
           }
         } else {
           return {
@@ -230,8 +256,6 @@ const useGame = create<State>((set, get) => ({
           }
         }
       })
-
-      // if piece is locked, clear line, add score, update level
     }, get().level * 1000)
 
     return () => {
@@ -240,8 +264,9 @@ const useGame = create<State>((set, get) => ({
   },
   viewMatrix() {
     const { matrix, currentPiece } = get()
+    const viewMatrix = matrix.map(row => [...row])
 
-    return addPieceTo(matrix.map(row => [...row]), currentPiece)
+    return addPieceTo(viewMatrix, currentPiece)
   }
 }))
 
