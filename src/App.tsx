@@ -20,6 +20,8 @@ interface State {
   level: number
   line: number
   score: number
+  controller: any
+  bindController: any
 
   matrix: any[][]
   pieceQueue: any[]
@@ -99,6 +101,7 @@ const getCurrentPiece = (type: string): CurrentPiece => ({
   position: [0, 3],
   piece: generatePiece(type),
 })
+const getTickSeconds = (level: number): number => (0.8 - (level - 1) * 0.007) ** (level - 1)
 
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
@@ -134,9 +137,9 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean =
       const px = position[0] + x
       const py = position[1] + y
 
-      if (px < 0 || px >= MATRIX_HEIGHT) {
+      if (px >= MATRIX_HEIGHT) {
         return false
-      } else if (py < 0 || py >= MATRIX_WIDTH) {
+      } else if (py >= MATRIX_WIDTH) {
         return false
       } else if (matrix[px][py]) {
         return false
@@ -213,7 +216,7 @@ const clearLines = (matrix: any[][]): [number, any[][]] => {
   const newMatrix = matrix.reduce((result, line) => {
     if (line.every((block) => block)) {
       lineCleared += 1
-      result.push(buildLine())
+      result.unshift(buildLine())
     } else {
       result.push(line)
     }
@@ -256,7 +259,7 @@ const useGame = create<State>((set, get) => ({
           }
         }
       })
-    }, get().level * 1000)
+    }, 1000 * getTickSeconds(get().level))
 
     return () => {
       clearInterval(ref)
@@ -267,6 +270,32 @@ const useGame = create<State>((set, get) => ({
     const viewMatrix = matrix.map(row => [...row])
 
     return addPieceTo(viewMatrix, currentPiece)
+  },
+  controller: {
+    ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft, state.matrix)(state.currentPiece)})),
+    ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight, state.matrix)(state.currentPiece)})),
+    z: () => {
+      set(state => ({
+        currentPiece: tryMove(rotateLeft, state.matrix)(state.currentPiece)
+      }))
+    },
+    x: () => {
+      set(state => ({
+        currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)
+      }))
+    }
+  },
+  bindController() {
+    const { controller } = get()
+
+    const eventListener = (event: any) => {
+      if (controller[event.key]) {
+        controller[event.key]()
+      }
+    }
+
+    document.addEventListener("keydown", eventListener)
+    return () => document.removeEventListener("keydown", eventListener)
   }
 }))
 
@@ -303,11 +332,13 @@ function App() {
   const {
     gameState,
     gameLoop,
+    bindController,
     level,
     viewMatrix
   } = useGame(state => state , shallow)
 
   useEffect(gameLoop, [gameLoop, gameState, level])
+  useEffect(bindController)
 
   return (
     <div className="App">
