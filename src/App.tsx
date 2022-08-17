@@ -33,6 +33,7 @@ interface State {
 }
 
 const LINES_EACH_LEVEL = 20
+const BASE_SCORE_FOR_LINES = [0, 40, 100, 300, 1200]
 
 // when game state is GAME_OVER or PAUSE, press start to start the game
 // when game state is START, running game loop 
@@ -256,16 +257,21 @@ const useGame = create<State>((set, get) => ({
   },
   gameLoop() {
     const ref = setInterval(() => {
-      set(({matrix, line, currentPiece}) => {
+      set(({matrix, line, score, currentPiece}) => {
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
         if (isSamePiece(currentPiece, movedPiece)) {
           const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, currentPiece))
 
+          const newLine = line + lineCleared
+          const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
+
           return {
             currentPiece: getCurrentPiece(getPieceType()),
             matrix: newMatrix,
-            line: line + lineCleared
+            line: newLine,
+            level,
+            score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) 
           }
         } else {
           return {
@@ -354,6 +360,7 @@ function App() {
     gameLoop,
     bindController,
     level,
+    score,
     viewMatrix
   } = useGame(state => state , shallow)
 
@@ -363,6 +370,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">React Tetris</header>
+      <h5>level: {level}</h5>
+      <h5>score: {score}</h5>
       <Matrix matrix={viewMatrix()} />
     </div>
   );
