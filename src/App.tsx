@@ -125,6 +125,20 @@ const moveRight = (currentPiece: CurrentPiece) => {
   return move(currentPiece, ([x, y]) => [x, y + 1])
 }
 
+const hardDrop = (currentPiece: CurrentPiece, matrix: any[][]): CurrentPiece => {
+  const droppedPiece: CurrentPiece = {
+    ...currentPiece,
+    position: [currentPiece.position[0], currentPiece.position[1]]
+  }
+  while (isEmptyPosition(droppedPiece, matrix)) {
+    droppedPiece.position[0] += 1
+  }
+
+  droppedPiece.position[0] -= 1
+
+  return droppedPiece
+}
+
 const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean => {
   const { position, piece } = currentPiece
 
@@ -272,16 +286,22 @@ const useGame = create<State>((set, get) => ({
     return addPieceTo(viewMatrix, currentPiece)
   },
   controller: {
+    ArrowUp: () => set(state => ({ currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)})),
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft, state.matrix)(state.currentPiece)})),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight, state.matrix)(state.currentPiece)})),
-    z: () => {
+    KeyZ: () => {
       set(state => ({
         currentPiece: tryMove(rotateLeft, state.matrix)(state.currentPiece)
       }))
     },
-    x: () => {
+    KeyX: () => {
       set(state => ({
         currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)
+      }))
+    },
+    Space: () => {
+      set(state => ({
+        currentPiece: hardDrop(state.currentPiece, state.matrix)
       }))
     }
   },
@@ -289,8 +309,8 @@ const useGame = create<State>((set, get) => ({
     const { controller } = get()
 
     const eventListener = (event: any) => {
-      if (controller[event.key]) {
-        controller[event.key]()
+      if (controller[event.code]) {
+        controller[event.code]()
       }
     }
 
