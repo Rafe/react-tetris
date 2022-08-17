@@ -137,9 +137,9 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean =
       const px = position[0] + x
       const py = position[1] + y
 
-      if (px >= MATRIX_HEIGHT) {
+      if (px < 0 || px >= MATRIX_HEIGHT) {
         return false
-      } else if (py >= MATRIX_WIDTH) {
+      } else if (py < 0 || py >= MATRIX_WIDTH) {
         return false
       } else if (matrix[px][py]) {
         return false
