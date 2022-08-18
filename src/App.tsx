@@ -24,7 +24,8 @@ interface State {
   bindController: any
 
   matrix: any[][]
-  pieceQueue: any[]
+  nextPieceType: string
+  holdPieceType: string
   currentPiece: CurrentPiece
 
   addScore: (added: number) => void
@@ -250,14 +251,15 @@ const useGame = create<State>((set, get) => ({
 
   matrix: buildMatrix(),
   currentPiece: getCurrentPiece(getPieceType()),
-  pieceQueue: [],
+  nextPieceType: getPieceType(),
+  holdPieceType: "",
 
   addScore(added: number) {
     set(state => ({ score: state.score + added }))
   },
   gameLoop() {
     const ref = setInterval(() => {
-      set(({matrix, line, score, currentPiece}) => {
+      set(({matrix, line, score, currentPiece, nextPieceType}) => {
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
         if (isSamePiece(currentPiece, movedPiece)) {
@@ -267,9 +269,10 @@ const useGame = create<State>((set, get) => ({
           const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
 
           return {
-            currentPiece: getCurrentPiece(getPieceType()),
+            currentPiece: getCurrentPiece(nextPieceType),
             matrix: newMatrix,
             line: newLine,
+            nextPieceType: getPieceType(),
             level,
             score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) 
           }
@@ -362,6 +365,8 @@ function App() {
     bindController,
     level,
     score,
+    holdPieceType,
+    nextPieceType,
     viewMatrix
   } = useGame(state => state , shallow)
 
@@ -373,6 +378,8 @@ function App() {
       <header className="App-header">React Tetris</header>
       <h5>level: {level}</h5>
       <h5>score: {score}</h5>
+      <h5>next: {nextPieceType}</h5>
+      <h5>hold: {holdPieceType}</h5>
       <Matrix matrix={viewMatrix()} />
     </div>
   );
