@@ -295,6 +295,7 @@ const useGame = create<State>((set, get) => ({
     ArrowUp: () => set(state => ({ currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)})),
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft, state.matrix)(state.currentPiece)})),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight, state.matrix)(state.currentPiece)})),
+    ArrowDown: () => set(state => ({ currentPiece: tryMove(moveDown, state.matrix)(state.currentPiece)})),
     KeyZ: () => {
       set(state => ({
         currentPiece: tryMove(rotateLeft, state.matrix)(state.currentPiece)
