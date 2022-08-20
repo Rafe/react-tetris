@@ -258,6 +258,10 @@ const useGame = create<State>((set, get) => ({
     set(state => ({ score: state.score + added }))
   },
   gameLoop() {
+    if (get().gameState === GameState.GAME_OVER) {
+      return null
+    }
+
     const ref = setInterval(() => {
       set(({matrix, line, score, currentPiece, nextPieceType}) => {
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
@@ -267,12 +271,14 @@ const useGame = create<State>((set, get) => ({
 
           const newLine = line + lineCleared
           const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
+          const nextPiece = getCurrentPiece(nextPieceType);
 
           return {
-            currentPiece: getCurrentPiece(nextPieceType),
+            currentPiece: nextPiece,
             matrix: newMatrix,
             line: newLine,
             nextPieceType: getPieceType(),
+            gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
             level,
             score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) 
           }
@@ -367,7 +373,7 @@ function App() {
     score,
     holdPieceType,
     nextPieceType,
-    viewMatrix
+    viewMatrix,
   } = useGame(state => state , shallow)
 
   useEffect(gameLoop, [gameLoop, gameState, level])
@@ -376,6 +382,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">React Tetris</header>
+      <h5>game state: {gameState}</h5>
       <h5>level: {level}</h5>
       <h5>score: {score}</h5>
       <h5>next: {nextPieceType}</h5>
