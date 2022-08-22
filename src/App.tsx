@@ -243,7 +243,7 @@ const clearLines = (matrix: any[][]): [number, any[][]] => {
   return [lineCleared, newMatrix]
 }
 
-const useGame = create<State>((set, get) => ({
+const initializeGame = () => ({
   gameState: GameState.START,
   level: 1,
   line: 0,
@@ -253,17 +253,20 @@ const useGame = create<State>((set, get) => ({
   currentPiece: getCurrentPiece(getPieceType()),
   nextPieceType: getPieceType(),
   holdPieceType: "",
+})
 
+const useGame = create<State>((set, get) => ({
+  ...initializeGame(),
   addScore(added: number) {
     set(state => ({ score: state.score + added }))
   },
   gameLoop() {
-    if (get().gameState === GameState.GAME_OVER) {
-      return null
-    }
-
     const ref = setInterval(() => {
-      set(({matrix, line, score, currentPiece, nextPieceType}) => {
+      set(({matrix, gameState, line, score, currentPiece, nextPieceType}) => {
+        if (gameState === GameState.GAME_OVER) {
+          return {}
+        }
+
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
         if (isSamePiece(currentPiece, movedPiece)) {
@@ -319,6 +322,12 @@ const useGame = create<State>((set, get) => ({
       set(state => ({
         currentPiece: hardDrop(state.currentPiece, state.matrix)
       }))
+    },
+    Enter: () => {
+      const {gameState} = get()
+      if (gameState === GameState.GAME_OVER) {
+        set(state => initializeGame())
+      }
     }
   },
   bindController() {
