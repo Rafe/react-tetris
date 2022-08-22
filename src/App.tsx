@@ -207,7 +207,7 @@ const rotateLeft = rotate({ clockwise: false})
 
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   const [x, y] = currentPiece.position
-  if (x < matrix.length && y < matrix[x].length) {
+  if (x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length) {
     for (let i = 0; i < currentPiece.piece.length; i++) {
       for (let j = 0; j < currentPiece.piece[i].length; j++) {
         if (x + i < matrix.length && y + j < matrix[0].length && currentPiece.piece[i][j]) {
