@@ -28,7 +28,6 @@ interface State {
   holdPieceType: string
   currentPiece: CurrentPiece
 
-  addScore: (added: number) => void
   gameLoop: () => any
   viewMatrix: () => any[][]
 }
@@ -257,9 +256,6 @@ const initializeGame = () => ({
 
 const useGame = create<State>((set, get) => ({
   ...initializeGame(),
-  addScore(added: number) {
-    set(state => ({ score: state.score + added }))
-  },
   gameLoop() {
     const ref = setInterval(() => {
       set(({matrix, gameState, line, score, currentPiece, nextPieceType}) => {
