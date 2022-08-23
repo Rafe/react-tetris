@@ -97,13 +97,16 @@ const generatePiece = (type: string): number[][] => {
 
 const pieceTypes = ["I", "L", "J", "Z", "S", "O", "T"]
 const getPieceType = () => pieceTypes[Math.floor(Math.random() * pieceTypes.length)]
-const getCurrentPiece = (type: string): CurrentPiece => ({
-  type,
-  position: [0, 3],
-  piece: generatePiece(type),
-})
-const getTickSeconds = (level: number): number => (0.8 - (level - 1) * 0.007) ** (level - 1)
+const getCurrentPiece = (type: string): CurrentPiece => {
+  const piece = generatePiece(type)
+  return {
+    type,
+    position: [0, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
+    piece
+  }
+}
 
+const getTickSeconds = (level: number): number => (0.8 - (level - 1) * 0.007) ** (level - 1)
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
 
@@ -259,7 +262,7 @@ const useGame = create<State>((set, get) => ({
   gameLoop() {
     const ref = setInterval(() => {
       set(({matrix, gameState, line, score, currentPiece, nextPieceType}) => {
-        if (gameState === GameState.GAME_OVER) {
+        if (gameState === GameState.GAME_OVER || gameState === GameState.PAUSE) {
           return {}
         }
 
@@ -323,13 +326,21 @@ const useGame = create<State>((set, get) => ({
       const {gameState} = get()
       if (gameState === GameState.GAME_OVER) {
         set(state => initializeGame())
+      } else if (gameState === GameState.START) {
+        set(state => ({ gameState: GameState.PAUSE }))
+      } else {
+        set(state => ({ gameState: GameState.START }))
       }
     }
   },
   bindController() {
-    const { controller } = get()
+    const { controller, gameState } = get()
 
     const eventListener = (event: any) => {
+      if ([GameState.GAME_OVER, GameState.PAUSE].includes(gameState) && event.code !== "Enter") {
+        return
+      }
+
       if (controller[event.code]) {
         controller[event.code]()
       }
