@@ -222,7 +222,7 @@ const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   return matrix
 }
 
-const isSamePiece = (currentPiece: CurrentPiece, movedPiece: CurrentPiece): boolean => {
+const isSamePosition = (currentPiece: CurrentPiece, movedPiece: CurrentPiece): boolean => {
   const [x, y] = currentPiece.position;
   const [mx, my] = movedPiece.position;
 
@@ -268,7 +268,7 @@ const useGame = create<State>((set, get) => ({
 
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
-        if (isSamePiece(currentPiece, movedPiece)) {
+        if (isSamePosition(currentPiece, movedPiece)) {
           const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, currentPiece))
 
           const newLine = line + lineCleared
