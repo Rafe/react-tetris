@@ -257,6 +257,24 @@ const initializeGame = () => ({
   holdPieceType: "",
 })
 
+const lockPiece = (currentPiece: CurrentPiece, matrix: any[][], nextPieceType: string, line: number, score: number) => {
+  const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, currentPiece))
+
+  const newLine = line + lineCleared
+  const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
+  const nextPiece = getCurrentPiece(nextPieceType);
+
+  return {
+    currentPiece: nextPiece,
+    matrix: newMatrix,
+    line: newLine,
+    nextPieceType: getPieceType(),
+    gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
+    level,
+    score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) 
+  }
+}
+
 const useGame = create<State>((set, get) => ({
   ...initializeGame(),
   gameLoop() {
@@ -269,21 +287,7 @@ const useGame = create<State>((set, get) => ({
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
         if (isSamePosition(currentPiece, movedPiece)) {
-          const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, currentPiece))
-
-          const newLine = line + lineCleared
-          const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
-          const nextPiece = getCurrentPiece(nextPieceType);
-
-          return {
-            currentPiece: nextPiece,
-            matrix: newMatrix,
-            line: newLine,
-            nextPieceType: getPieceType(),
-            gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
-            level,
-            score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) 
-          }
+          return lockPiece(currentPiece, matrix, nextPieceType, line, score)
         } else {
           return {
             currentPiece: movedPiece
@@ -318,9 +322,9 @@ const useGame = create<State>((set, get) => ({
       }))
     },
     Space: () => {
-      set(state => ({
-        currentPiece: hardDrop(state.currentPiece, state.matrix)
-      }))
+      set(({ currentPiece, matrix, line, score, nextPieceType }) =>
+        lockPiece(hardDrop(currentPiece, matrix), matrix, nextPieceType, line, score)
+      )
     },
     Enter: () => {
       const {gameState} = get()
