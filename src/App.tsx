@@ -286,13 +286,13 @@ const useGame = create<State>((set, get) => ({
 
         const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
-        if (isSamePosition(currentPiece, movedPiece)) {
-          return lockPiece(currentPiece, matrix, nextPieceType, line, score)
-        } else {
+        if (!isSamePosition(currentPiece, movedPiece)) {
           return {
             currentPiece: movedPiece
           }
         }
+
+        return lockPiece(currentPiece, matrix, nextPieceType, line, score)
       })
     }, 1000 * getTickSeconds(get().level))
 
@@ -313,13 +313,13 @@ const useGame = create<State>((set, get) => ({
     ArrowDown: () => set(({matrix, currentPiece, line, score, nextPieceType}) => {
       const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
-      if (isSamePosition(currentPiece, movedPiece)) {
-        return lockPiece(currentPiece, matrix, nextPieceType, line, score)
-      } else {
+      if (!isSamePosition(currentPiece, movedPiece)) {
         return {
           currentPiece: movedPiece
         }
       }
+
+      return lockPiece(currentPiece, matrix, nextPieceType, line, score)
     }),
     KeyZ: () => {
       set(state => ({
