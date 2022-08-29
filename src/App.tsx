@@ -9,9 +9,17 @@ enum GameState {
   GAME_OVER
 }
 
+enum Direction {
+  UP,
+  RIGHT,
+  DOWN,
+  LEFT
+}
+
 type CurrentPiece = {
   type: string,
   position: [number, number]
+  direction: Direction
   piece: any
 }
 
@@ -101,6 +109,7 @@ const getCurrentPiece = (type: string): CurrentPiece => {
   const piece = generatePiece(type)
   return {
     type,
+    direction: Direction.UP,
     position: [0, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
     piece
   }
