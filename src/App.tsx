@@ -43,9 +43,9 @@ interface State {
 const LINES_EACH_LEVEL = 20
 const BASE_SCORE_FOR_LINES = [0, 40, 100, 300, 1200]
 
-// when game state is GAME_OVER or PAUSE, press start to start the game
+// when game state is GAME_OVER or PAUSE, enter start to start the game
 // when game state is START, running game loop 
-// the current piece fall by game speed
+//   the current piece fall by game speed
 //   when falling, show the future position that the piece will fall
 //   when piece can not move when fall, lock piece
 //   when piece fill the line, remove the line, stop fall for a tick, add score based on speed and line removed
@@ -209,6 +209,7 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
 
   return {
     ...currentPiece,
+    direction: (direction + (clockwise ? 1 : 3)) % 4,
     piece: newPiece
   }
 }
