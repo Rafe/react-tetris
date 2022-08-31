@@ -9,17 +9,9 @@ enum GameState {
   GAME_OVER
 }
 
-enum Direction {
-  UP,
-  RIGHT,
-  DOWN,
-  LEFT
-}
-
 type CurrentPiece = {
   type: string,
   position: [number, number]
-  direction: Direction
   piece: any
 }
 
@@ -62,40 +54,40 @@ const generatePiece = (type: string): number[][] => {
     case "I":
       return [
         [1],
-        [1],
+        [2],
         [1],
         [1],
       ]
     case "L":
       return [
         [1, 0],
-        [1, 0],
+        [2, 0],
         [1, 1],
       ]
     case "J":
       return [
         [0, 1],
-        [0, 1],
+        [0, 2],
         [1, 1],
       ]
     case "Z":
       return [
-        [1, 1, 0],
+        [1, 2, 0],
         [0, 1, 1],
       ]
     case "S":
       return [
-        [0, 1, 1],
+        [0, 2, 1],
         [1, 1, 0],
       ]
     case "O":
       return [
-        [1, 1],
+        [2, 1],
         [1, 1],
       ]
     case "T":
       return [
-        [1, 1, 1],
+        [1, 2, 1],
         [0, 1, 0],
       ]
     default:
@@ -109,7 +101,6 @@ const getCurrentPiece = (type: string): CurrentPiece => {
   const piece = generatePiece(type)
   return {
     type,
-    direction: Direction.UP,
     position: [0, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
     piece
   }
@@ -190,26 +181,38 @@ const tryMove = (moveMethod: (p: CurrentPiece) => CurrentPiece, matrix: number[]
 }
 
 const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentPiece): CurrentPiece => {
-  const piece = currentPiece.piece
+  const { piece } = currentPiece
   const height = piece.length
   const width = piece[0].length
   const newPiece = Array(width).fill(null).map(() => Array(height).fill(0))
+  let px = 0
+  let py = 0
 
   for(let x = 0; x < height; x++) {
     for(let y = 0; y < width; y++) {
       if (piece[x][y]) {
         if (clockwise) {
+          if (piece[x][y] === 2) {
+            px = x - y
+            py = y - ((height - 1) - x)
+          }
           newPiece[y][(height - 1) - x] = piece[x][y]
         } else {
+          if (piece[x][y] === 2) {
+            px = x - ((width - 1) - y)
+            py = y - x
+          }
           newPiece[(width - 1) - y][x] = piece[x][y]
         }
       }
     }
   }
 
+  const [originX, originY] = currentPiece.position
+
   return {
     ...currentPiece,
-    direction: (direction + (clockwise ? 1 : 3)) % 4,
+    position: [originX + px, originY + py],
     piece: newPiece
   }
 }
