@@ -316,8 +316,9 @@ const useGame = create<State>((set, get) => ({
   viewMatrix() {
     const { matrix, currentPiece } = get()
     const viewMatrix = matrix.map(row => [...row])
+    const reviewPiece = hardDrop(currentPiece, viewMatrix)
 
-    return addPieceTo(viewMatrix, currentPiece)
+    return addPieceTo(addPieceTo(viewMatrix, currentPiece), reviewPiece)
   },
   controller: {
     ArrowUp: () => set(state => ({ currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)})),
