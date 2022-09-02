@@ -82,7 +82,7 @@ const generatePiece = (type: string): number[][] => {
       ]
     case "O":
       return [
-        [2, 1],
+        [1, 1],
         [1, 1],
       ]
     case "T":
