@@ -170,7 +170,11 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean =
 
 const tryMove = (moveMethod: (p: CurrentPiece) => CurrentPiece, matrix: number[][]) => {
   return (currentPiece: CurrentPiece): CurrentPiece => {
-    const movedPiece = moveMethod(currentPiece)
+    let movedPiece = moveMethod(currentPiece)
+
+    if (movedPiece.position[0] < 0) {
+      movedPiece.position[0] += 1
+    }
 
     if (isEmptyPosition(movedPiece, matrix)) {
       return movedPiece
