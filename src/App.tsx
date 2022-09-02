@@ -12,7 +12,7 @@ enum GameState {
 type CurrentPiece = {
   type: string,
   position: [number, number]
-  piece: any
+  piece: number[][]
 }
 
 interface State {
@@ -180,6 +180,7 @@ const tryMove = (moveMethod: (p: CurrentPiece) => CurrentPiece, matrix: number[]
   }
 }
 
+// when transform, record the xy of pivot, and transformed xy of pivot, calculate to keep x1 == x2 + x, y1 == y2 + y
 const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentPiece): CurrentPiece => {
   const { piece } = currentPiece
   const height = piece.length
@@ -190,20 +191,19 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
 
   for(let x = 0; x < height; x++) {
     for(let y = 0; y < width; y++) {
-      if (piece[x][y]) {
-        if (clockwise) {
-          if (piece[x][y] === 2) {
-            px = x - y
-            py = y - ((height - 1) - x)
-          }
-          newPiece[y][(height - 1) - x] = piece[x][y]
-        } else {
-          if (piece[x][y] === 2) {
-            px = x - ((width - 1) - y)
-            py = y - x
-          }
-          newPiece[(width - 1) - y][x] = piece[x][y]
-        }
+      if (!piece[x][y]) {
+        continue
+      }
+
+      const [tx, ty] = clockwise ?
+        [y, (height - 1 - x)] : 
+        [width - 1 - y, x]
+
+      newPiece[tx][ty] = piece[x][y]
+
+      if (piece[x][y] === 2) {
+        px = x - tx
+        py = y - ty
       }
     }
   }
