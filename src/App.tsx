@@ -61,23 +61,23 @@ const generatePiece = (type: string): number[][] => {
     case "L":
       return [
         [1, 0],
-        [2, 0],
+        [1, 0],
         [1, 1],
       ]
     case "J":
       return [
         [0, 1],
-        [0, 2],
+        [0, 1],
         [1, 1],
       ]
     case "Z":
       return [
-        [1, 2, 0],
+        [1, 1, 0],
         [0, 1, 1],
       ]
     case "S":
       return [
-        [0, 2, 1],
+        [0, 1, 1],
         [1, 1, 0],
       ]
     case "O":
