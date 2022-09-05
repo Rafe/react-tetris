@@ -328,7 +328,7 @@ const useGame = create<State>((set, get) => ({
     ArrowUp: () => set(state => ({ currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)})),
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft, state.matrix)(state.currentPiece)})),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight, state.matrix)(state.currentPiece)})),
-    ArrowDown: () => set(({matrix, currentPiece, line, score, nextPieceType}) => {
+    ArrowDown: () => set(({ matrix, currentPiece, line, score, nextPieceType }) => {
       const movedPiece = tryMove(moveDown, matrix)(currentPiece)
 
       if (!isSamePosition(currentPiece, movedPiece)) {
@@ -355,14 +355,15 @@ const useGame = create<State>((set, get) => ({
       )
     },
     Enter: () => {
-      const {gameState} = get()
-      if (gameState === GameState.GAME_OVER) {
-        set(state => initializeGame())
-      } else if (gameState === GameState.START) {
-        set(state => ({ gameState: GameState.PAUSE }))
-      } else {
-        set(state => ({ gameState: GameState.START }))
-      }
+      set(({ gameState }) => {
+        if (gameState === GameState.GAME_OVER) {
+          return initializeGame()
+        } else if (gameState === GameState.START) {
+          return { gameState: GameState.PAUSE }
+        } else {
+          return { gameState: GameState.START }
+        }
+      })
     }
   },
   bindController() {
