@@ -221,8 +221,10 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
   }
 }
 
-const rotateRight = rotate({ clockwise: true })
-const rotateLeft = rotate({ clockwise: false})
+const rotateRight = (currentPiece: CurrentPiece, matrix: number[][]) =>
+  tryMove(rotate({ clockwise: true }), matrix)(currentPiece)
+const rotateLeft = (currentPiece: CurrentPiece, matrix: number[][]) =>
+  tryMove(rotate({ clockwise: false }), matrix)(currentPiece)
 
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   const [x, y] = currentPiece.position
@@ -325,7 +327,7 @@ const useGame = create<State>((set, get) => ({
     return addPieceTo(addPieceTo(viewMatrix, currentPiece), reviewPiece)
   },
   controller: {
-    ArrowUp: () => set(state => ({ currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)})),
+    ArrowUp: () => set(({ currentPiece, matrix }) => ({ currentPiece: rotateRight(currentPiece, matrix) })),
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft, state.matrix)(state.currentPiece)})),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight, state.matrix)(state.currentPiece)})),
     ArrowDown: () => set(({ matrix, currentPiece, line, score, nextPieceType }) => {
@@ -340,13 +342,13 @@ const useGame = create<State>((set, get) => ({
       return lockPiece(currentPiece, matrix, nextPieceType, line, score)
     }),
     KeyZ: () => {
-      set(state => ({
-        currentPiece: tryMove(rotateLeft, state.matrix)(state.currentPiece)
+      set(({ currentPiece, matrix}) => ({
+        currentPiece: rotateLeft(currentPiece, matrix)
       }))
     },
     KeyX: () => {
-      set(state => ({
-        currentPiece: tryMove(rotateRight, state.matrix)(state.currentPiece)
+      set(({ currentPiece, matrix}) => ({
+        currentPiece: rotateRight(currentPiece, matrix)
       }))
     },
     Space: () => {
