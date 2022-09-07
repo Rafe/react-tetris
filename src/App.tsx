@@ -168,8 +168,8 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean =
   return true
 }
 
-const tryMove = (moveMethod: (p: CurrentPiece) => CurrentPiece, matrix: number[][]) => {
-  return (currentPiece: CurrentPiece): CurrentPiece => {
+const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, n: number[][]) => CurrentPiece) => {
+  return (currentPiece, matrix) => {
     let movedPiece = moveMethod(currentPiece)
 
     if (movedPiece.position[0] < 0) {
@@ -222,9 +222,9 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
 }
 
 const rotateRight = (currentPiece: CurrentPiece, matrix: number[][]) =>
-  tryMove(rotate({ clockwise: true }), matrix)(currentPiece)
+  tryMove(rotate({ clockwise: true }))(currentPiece, matrix)
 const rotateLeft = (currentPiece: CurrentPiece, matrix: number[][]) =>
-  tryMove(rotate({ clockwise: false }), matrix)(currentPiece)
+  tryMove(rotate({ clockwise: false }))(currentPiece, matrix)
 
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
   const [x, y] = currentPiece.position
@@ -303,7 +303,7 @@ const useGame = create<State>((set, get) => ({
           return {}
         }
 
-        const movedPiece = tryMove(moveDown, matrix)(currentPiece)
+        const movedPiece = tryMove(moveDown)(currentPiece, matrix)
 
         if (!isSamePosition(currentPiece, movedPiece)) {
           return {
@@ -328,10 +328,10 @@ const useGame = create<State>((set, get) => ({
   },
   controller: {
     ArrowUp: () => set(({ currentPiece, matrix }) => ({ currentPiece: rotateRight(currentPiece, matrix) })),
-    ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft, state.matrix)(state.currentPiece)})),
-    ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight, state.matrix)(state.currentPiece)})),
+    ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft)(state.currentPiece, state.matrix) })),
+    ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight)(state.currentPiece, state.matrix)})),
     ArrowDown: () => set(({ matrix, currentPiece, line, score, nextPieceType }) => {
-      const movedPiece = tryMove(moveDown, matrix)(currentPiece)
+      const movedPiece = tryMove(moveDown)(currentPiece, matrix)
 
       if (!isSamePosition(currentPiece, movedPiece)) {
         return {
