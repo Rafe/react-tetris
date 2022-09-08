@@ -323,8 +323,9 @@ const useGame = create<State>((set, get) => ({
     const { matrix, currentPiece } = get()
     const viewMatrix = matrix.map(row => [...row])
     const reviewPiece = hardDrop(currentPiece, viewMatrix)
+    reviewPiece.type = "REVIEW"
 
-    return addPieceTo(addPieceTo(viewMatrix, currentPiece), reviewPiece)
+    return addPieceTo(addPieceTo(viewMatrix, reviewPiece), currentPiece)
   },
   controller: {
     ArrowUp: () => set(({ currentPiece, matrix }) => ({ currentPiece: rotateRight(currentPiece, matrix) })),
@@ -386,11 +387,21 @@ const useGame = create<State>((set, get) => ({
   }
 }))
 
+const BLOCK_COLORS: { [key: string]: string } = {
+  I: "blue",
+  S: "yellow",
+  L: "silver",
+  J: "purple",
+  T: "red",
+  Z: "green",
+  O: "brown",
+  REVIEW: "gray"
+}
 const Block = styled.td<{type: string}>`
   border: 1px solid black;
   width: 20px;
   height: 20px;
-  background-color: ${props => props.type ? "black" : "#EEEEEE"}
+  background-color: ${props => BLOCK_COLORS[props.type] || "#EEEEEE"}
 `
 
 const MatrixTable = styled.table`
