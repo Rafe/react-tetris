@@ -395,20 +395,20 @@ const BLOCK_COLORS: { [key: string]: string } = {
   T: "red",
   Z: "green",
   O: "brown",
-  REVIEW: "gray"
+  REVIEW: "#DDD"
 }
 const Block = styled.td<{type: string}>`
   border: 1px solid black;
   width: 20px;
   height: 20px;
-  background-color: ${props => BLOCK_COLORS[props.type] || "#EEEEEE"}
+  background-color: ${props => BLOCK_COLORS[props.type] || "#EEE"}
 `
 
 const MatrixTable = styled.table`
   border-collapse: collapse;
 `
 
-const Matrix = ({matrix}: {matrix: any[][]}) => (
+const Matrix = ({matrix}: {matrix: string[][]}) => (
   <MatrixTable>
     <tbody>
       {
