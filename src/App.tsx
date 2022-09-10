@@ -9,10 +9,14 @@ enum GameState {
   GAME_OVER
 }
 
+type Piece = number[][]
+type PieceType = "I" | "L" | "J" | "Z" | "S" | "O" | "T" | "R"
+type Matrix = PieceType[][]
+
 type CurrentPiece = {
   type: string,
   position: [number, number]
-  piece: number[][]
+  piece: Piece
 }
 
 interface State {
@@ -23,9 +27,8 @@ interface State {
   controller: any
   bindController: any
 
-  matrix: any[][]
-  nextPieceType: string
-  holdPieceType: string
+  matrix: Matrix
+  nextPieceType: PieceType
   currentPiece: CurrentPiece
 
   gameLoop: () => any
@@ -49,7 +52,7 @@ const BASE_SCORE_FOR_LINES = [0, 40, 100, 300, 1200]
 const MATRIX_WIDTH = 10
 const MATRIX_HEIGHT = 20
 
-const generatePiece = (type: string): number[][] => {
+const generatePiece = (type: PieceType): Piece => {
   switch(type) {
     case "I":
       return [
@@ -95,9 +98,9 @@ const generatePiece = (type: string): number[][] => {
   }
 }
 
-const pieceTypes = ["I", "L", "J", "Z", "S", "O", "T"]
+const pieceTypes: PieceType[] = ["I", "L", "J", "Z", "S", "O", "T", "R"]
 const getPieceType = () => pieceTypes[Math.floor(Math.random() * pieceTypes.length)]
-const getCurrentPiece = (type: string): CurrentPiece => {
+const getCurrentPiece = (type: PieceType): CurrentPiece => {
   const piece = generatePiece(type)
   return {
     type,
@@ -129,7 +132,7 @@ const moveRight = (currentPiece: CurrentPiece) => {
   return move(currentPiece, ([x, y]) => [x, y + 1])
 }
 
-const hardDrop = (currentPiece: CurrentPiece, matrix: any[][]): CurrentPiece => {
+const hardDrop = (currentPiece: CurrentPiece, matrix: Matrix): CurrentPiece => {
   const droppedPiece: CurrentPiece = {
     ...currentPiece,
     position: [currentPiece.position[0], currentPiece.position[1]]
@@ -143,7 +146,7 @@ const hardDrop = (currentPiece: CurrentPiece, matrix: any[][]): CurrentPiece => 
   return droppedPiece
 }
 
-const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean => {
+const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean => {
   const { position, piece } = currentPiece
 
   for(let x = 0; x < piece.length; x++) {
@@ -168,7 +171,7 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: any[][]): boolean =
   return true
 }
 
-const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, n: number[][]) => CurrentPiece) => {
+const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
   return (currentPiece, matrix) => {
     let movedPiece = moveMethod(currentPiece)
 
@@ -221,9 +224,9 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
   }
 }
 
-const rotateRight = (currentPiece: CurrentPiece, matrix: number[][]) =>
+const rotateRight = (currentPiece: CurrentPiece, matrix: Matrix) =>
   tryMove(rotate({ clockwise: true }))(currentPiece, matrix)
-const rotateLeft = (currentPiece: CurrentPiece, matrix: number[][]) =>
+const rotateLeft = (currentPiece: CurrentPiece, matrix: Matrix) =>
   tryMove(rotate({ clockwise: false }))(currentPiece, matrix)
 
 const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
@@ -273,10 +276,9 @@ const initializeGame = () => ({
   matrix: buildMatrix(),
   currentPiece: getCurrentPiece(getPieceType()),
   nextPieceType: getPieceType(),
-  holdPieceType: "",
 })
 
-const lockPiece = (currentPiece: CurrentPiece, matrix: any[][], nextPieceType: string, line: number, score: number) => {
+const lockPiece = (currentPiece: CurrentPiece, matrix: Matrix, nextPieceType: PieceType, line: number, score: number) => {
   const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, currentPiece))
 
   const newLine = line + lineCleared
@@ -323,7 +325,7 @@ const useGame = create<State>((set, get) => ({
     const { matrix, currentPiece } = get()
     const viewMatrix = matrix.map(row => [...row])
     const reviewPiece = hardDrop(currentPiece, viewMatrix)
-    reviewPiece.type = "REVIEW"
+    reviewPiece.type = "R"
 
     return addPieceTo(addPieceTo(viewMatrix, reviewPiece), currentPiece)
   },
@@ -395,8 +397,9 @@ const BLOCK_COLORS: { [key: string]: string } = {
   T: "red",
   Z: "green",
   O: "brown",
-  REVIEW: "#DDD"
+  R: "#DDD"
 }
+
 const Block = styled.td<{type: string}>`
   border: 1px solid black;
   width: 20px;
@@ -408,15 +411,15 @@ const MatrixTable = styled.table`
   border-collapse: collapse;
 `
 
-const Matrix = ({matrix}: {matrix: string[][]}) => (
+const Board = ({matrix}: {matrix: string[][]}) => (
   <MatrixTable>
     <tbody>
       {
       matrix.map((line, i) => (
         <tr key={`line-${i}`}>
           {
-            line.map((block, j) => (
-              <Block key={`block-${i}-${j}`} type={block} />
+            line.map((type, j) => (
+              <Block key={`block-${i}-${j}`} type={type} />
             ))
           }
         </tr>
@@ -433,7 +436,6 @@ function App() {
     bindController,
     level,
     score,
-    holdPieceType,
     nextPieceType,
     viewMatrix,
   } = useGame(state => state , shallow)
@@ -448,8 +450,7 @@ function App() {
       <h5>level: {level}</h5>
       <h5>score: {score}</h5>
       <h5>next: {nextPieceType}</h5>
-      <h5>hold: {holdPieceType}</h5>
-      <Matrix matrix={viewMatrix()} />
+      <Board matrix={viewMatrix()} />
     </div>
   );
 }
