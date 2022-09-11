@@ -99,7 +99,7 @@ const generatePiece = (type: PieceType): Piece => {
 }
 
 const pieceTypes: PieceType[] = ["I", "L", "J", "Z", "S", "O", "T", "R"]
-const getPieceType = () => pieceTypes[Math.floor(Math.random() * pieceTypes.length)]
+const getPieceType = () => pieceTypes[Math.floor(Math.random() * (pieceTypes.length - 1))]
 const getCurrentPiece = (type: PieceType): CurrentPiece => {
   const piece = generatePiece(type)
   return {
