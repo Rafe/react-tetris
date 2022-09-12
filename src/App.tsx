@@ -413,19 +413,17 @@ const MatrixTable = styled.table`
 
 const Board = ({matrix}: {matrix: string[][]}) => (
   <MatrixTable>
-    <tbody>
-      {
-      matrix.map((line, i) => (
-        <tr key={`line-${i}`}>
-          {
-            line.map((type, j) => (
-              <Block key={`block-${i}-${j}`} type={type} />
-            ))
-          }
-        </tr>
-      ))
-      }
-    </tbody>
+    {
+    matrix.map((line, i) => (
+      <tr key={`line-${i}`}>
+        {
+          line.map((type, j) => (
+            <Block key={`block-${i}-${j}`} type={type} />
+          ))
+        }
+      </tr>
+    ))
+    }
   </MatrixTable>
 )
 
