@@ -447,7 +447,18 @@ function App() {
       <h5>game state: {gameState}</h5>
       <h5>level: {level}</h5>
       <h5>score: {score}</h5>
-      <h5>next: {nextPieceType}</h5>
+      <h5>next: </h5> 
+      <MatrixTable>
+        {getCurrentPiece(nextPieceType).piece.map((line, i) => (
+          <tr>
+            {
+              line.map((n, j) => (
+                <Block key={`review-block-${i}-${j}`} type={n > 0 ? nextPieceType : ""} />
+              ))
+            }
+          </tr>
+        ))}
+      </MatrixTable>
       <Board matrix={viewMatrix()} />
     </div>
   );
