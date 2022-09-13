@@ -31,8 +31,8 @@ interface State {
   nextPieceType: PieceType
   currentPiece: CurrentPiece
 
-  gameLoop: () => any
-  viewMatrix: () => any[][]
+  gameLoop: () => () => void
+  viewMatrix: () => PieceType[][]
 }
 
 const LINES_EACH_LEVEL = 20
