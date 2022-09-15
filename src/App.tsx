@@ -427,6 +427,17 @@ const Board = ({matrix}: {matrix: string[][]}) => (
   </MatrixTable>
 )
 
+const Container = styled.div`
+  display: flex;
+`
+
+const BoardContainer = styled.div`
+    flex: 1;
+`
+const NextContainer = styled.div`
+    flex: 1;
+`
+
 function App() {
   const {
     gameState,
@@ -442,25 +453,29 @@ function App() {
   useEffect(bindController)
 
   return (
-    <div className="App">
-      <header className="App-header">React Tetris</header>
-      <h5>game state: {gameState}</h5>
-      <h5>level: {level}</h5>
-      <h5>score: {score}</h5>
-      <h5>next: </h5> 
-      <MatrixTable>
-        {getCurrentPiece(nextPieceType).piece.map((line, i) => (
-          <tr>
-            {
-              line.map((n, j) => (
-                <Block key={`review-block-${i}-${j}`} type={n > 0 ? nextPieceType : ""} />
-              ))
-            }
-          </tr>
-        ))}
-      </MatrixTable>
-      <Board matrix={viewMatrix()} />
-    </div>
+    <Container>
+      <BoardContainer>
+        <Board matrix={viewMatrix()} />
+      </BoardContainer>
+      <NextContainer>
+        <header className="App-header">React Tetris</header>
+        <h5>game state: {gameState}</h5>
+        <h5>level: {level}</h5>
+        <h5>score: {score}</h5>
+        <h5>next: </h5> 
+        <MatrixTable>
+          {getCurrentPiece(nextPieceType).piece.map((line, i) => (
+            <tr>
+              {
+                line.map((n, j) => (
+                  <Block key={`review-block-${i}-${j}`} type={n > 0 ? nextPieceType : ""} />
+                ))
+              }
+            </tr>
+          ))}
+        </MatrixTable>
+      </NextContainer>
+    </Container>
   );
 }
 
