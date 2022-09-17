@@ -427,15 +427,25 @@ const Board = ({matrix}: {matrix: string[][]}) => (
   </MatrixTable>
 )
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+`
+
 const Container = styled.div`
   display: flex;
 `
 
 const BoardContainer = styled.div`
-    flex: 1;
+  margin: 10px;
 `
+
 const NextContainer = styled.div`
-    flex: 1;
+  margin: 10px;
+  height: 100px;
+  width: 100px;
 `
 
 function App() {
@@ -453,29 +463,33 @@ function App() {
   useEffect(bindController)
 
   return (
-    <Container>
-      <BoardContainer>
-        <Board matrix={viewMatrix()} />
-      </BoardContainer>
-      <NextContainer>
-        <header className="App-header">React Tetris</header>
-        <h5>game state: {gameState}</h5>
-        <h5>level: {level}</h5>
-        <h5>score: {score}</h5>
-        <h5>next: </h5> 
-        <MatrixTable>
-          {getCurrentPiece(nextPieceType).piece.map((line, i) => (
-            <tr>
-              {
-                line.map((n, j) => (
-                  <Block key={`review-block-${i}-${j}`} type={n > 0 ? nextPieceType : ""} />
-                ))
-              }
-            </tr>
-          ))}
-        </MatrixTable>
-      </NextContainer>
-    </Container>
+    <Wrapper>
+      <header>
+        <h1>React Tetris</h1>
+      </header>
+      <Container>
+        <BoardContainer>
+          <Board matrix={viewMatrix()} />
+        </BoardContainer>
+        <div>
+          <NextContainer>
+            <MatrixTable>
+              {getCurrentPiece(nextPieceType).piece.map((line, i) => (
+                <tr>
+                  {
+                    line.map((n, j) => (
+                      <Block key={`review-block-${i}-${j}`} type={n > 0 ? nextPieceType : ""} />
+                    ))
+                  }
+                </tr>
+              ))}
+            </MatrixTable>
+          </NextContainer>
+          <h5>level: {level}</h5>
+          <h5>score: {score}</h5>
+        </div>
+      </Container>
+    </Wrapper>
   );
 }
 
