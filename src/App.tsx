@@ -29,6 +29,7 @@ interface State {
 
   matrix: Matrix
   nextPieceType: PieceType
+  holdPieceType: PieceType
   currentPiece: CurrentPiece
 
   gameLoop: () => () => void
@@ -276,6 +277,7 @@ const initializeGame = () => ({
   matrix: buildMatrix(),
   currentPiece: getCurrentPiece(getPieceType()),
   nextPieceType: getPieceType(),
+  holdPieceType: null
 })
 
 const lockPiece = (currentPiece: CurrentPiece, matrix: Matrix, nextPieceType: PieceType, line: number, score: number) => {
