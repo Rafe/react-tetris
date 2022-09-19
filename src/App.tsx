@@ -227,6 +227,7 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
 
 const rotateRight = (currentPiece: CurrentPiece, matrix: Matrix) =>
   tryMove(rotate({ clockwise: true }))(currentPiece, matrix)
+
 const rotateLeft = (currentPiece: CurrentPiece, matrix: Matrix) =>
   tryMove(rotate({ clockwise: false }))(currentPiece, matrix)
 
