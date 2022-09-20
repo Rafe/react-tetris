@@ -14,7 +14,7 @@ type PieceType = "I" | "L" | "J" | "Z" | "S" | "O" | "T" | "R"
 type Matrix = PieceType[][]
 
 type CurrentPiece = {
-  type: string,
+  type: PieceType,
   position: [number, number]
   piece: Piece
 }
@@ -29,7 +29,7 @@ interface State {
 
   matrix: Matrix
   nextPieceType: PieceType
-  holdPieceType: PieceType
+  holdPieceType: PieceType | null
   currentPiece: CurrentPiece
 
   gameLoop: () => () => void
@@ -357,6 +357,13 @@ const useGame = create<State>((set, get) => ({
         currentPiece: rotateRight(currentPiece, matrix)
       }))
     },
+    KeyC: () => {
+      set(({ currentPiece, nextPieceType}) => ({
+        currentPiece: getCurrentPiece(nextPieceType),
+        nextPieceType: getPieceType(),
+        holdPieceType: currentPiece.type
+      }))
+    },
     Space: () => {
       set(({ currentPiece, matrix, line, score, nextPieceType }) =>
         lockPiece(hardDrop(currentPiece, matrix), matrix, nextPieceType, line, score)
@@ -459,6 +466,7 @@ function App() {
     level,
     score,
     nextPieceType,
+    holdPieceType,
     viewMatrix,
   } = useGame(state => state , shallow)
 
@@ -488,6 +496,7 @@ function App() {
               ))}
             </MatrixTable>
           </NextContainer>
+          <h5>hold: {holdPieceType}</h5>
           <h5>level: {level}</h5>
           <h5>score: {score}</h5>
         </div>
