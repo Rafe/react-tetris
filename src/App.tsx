@@ -30,6 +30,7 @@ interface State {
   matrix: Matrix
   nextPieceType: PieceType
   holdPieceType: PieceType | null
+  holdLocked: boolean
   currentPiece: CurrentPiece
 
   gameLoop: () => () => void
@@ -278,7 +279,8 @@ const initializeGame = () => ({
   matrix: buildMatrix(),
   currentPiece: getCurrentPiece(getPieceType()),
   nextPieceType: getPieceType(),
-  holdPieceType: null
+  holdPieceType: null,
+  holdLocked: false
 })
 
 const lockPiece = (currentPiece: CurrentPiece, matrix: Matrix, nextPieceType: PieceType, line: number, score: number) => {
@@ -292,6 +294,7 @@ const lockPiece = (currentPiece: CurrentPiece, matrix: Matrix, nextPieceType: Pi
     currentPiece: nextPiece,
     matrix: newMatrix,
     line: newLine,
+    holdLocked: false,
     nextPieceType: getPieceType(),
     gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
     level,
@@ -358,11 +361,26 @@ const useGame = create<State>((set, get) => ({
       }))
     },
     KeyC: () => {
-      set(({ currentPiece, nextPieceType}) => ({
-        currentPiece: getCurrentPiece(nextPieceType),
-        nextPieceType: getPieceType(),
-        holdPieceType: currentPiece.type
-      }))
+      set(({ currentPiece, holdPieceType, nextPieceType, holdLocked }) => {
+        if (holdLocked) {
+          return {}
+        }
+
+        if (!holdPieceType) {
+          return {
+            currentPiece: getCurrentPiece(nextPieceType),
+            nextPieceType: getPieceType(),
+            holdPieceType: currentPiece.type,
+            holdLocked: true
+          }
+        }
+
+        return {
+          currentPiece: getCurrentPiece(holdPieceType),
+          holdPieceType: currentPiece.type,
+          holdLocked: true
+        }
+      })
     },
     Space: () => {
       set(({ currentPiece, matrix, line, score, nextPieceType }) =>
