@@ -101,8 +101,8 @@ const generatePiece = (type: PieceType): Piece => {
 }
 
 const pieceTypes: PieceType[] = ["I", "L", "J", "Z", "S", "O", "T", "R"]
-const getPieceType = () => pieceTypes[Math.floor(Math.random() * (pieceTypes.length - 1))]
-const getCurrentPiece = (type: PieceType): CurrentPiece => {
+const generatePieceType = () => pieceTypes[Math.floor(Math.random() * (pieceTypes.length - 1))]
+const createCurrentPiece = (type: PieceType): CurrentPiece => {
   const piece = generatePiece(type)
   return {
     type,
@@ -277,8 +277,8 @@ const initializeGame = () => ({
   score: 0,
 
   matrix: buildMatrix(),
-  currentPiece: getCurrentPiece(getPieceType()),
-  nextPieceType: getPieceType(),
+  currentPiece: createCurrentPiece(generatePieceType()),
+  nextPieceType: generatePieceType(),
   holdPieceType: null,
   holdLocked: false
 })
@@ -288,14 +288,14 @@ const lockPiece = (currentPiece: CurrentPiece, matrix: Matrix, nextPieceType: Pi
 
   const newLine = line + lineCleared
   const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
-  const nextPiece = getCurrentPiece(nextPieceType);
+  const nextPiece = createCurrentPiece(nextPieceType);
 
   return {
     currentPiece: nextPiece,
     matrix: newMatrix,
     line: newLine,
     holdLocked: false,
-    nextPieceType: getPieceType(),
+    nextPieceType: generatePieceType(),
     gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
     level,
     score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) 
@@ -368,15 +368,15 @@ const useGame = create<State>((set, get) => ({
 
         if (!holdPieceType) {
           return {
-            currentPiece: getCurrentPiece(nextPieceType),
-            nextPieceType: getPieceType(),
+            currentPiece: createCurrentPiece(nextPieceType),
+            nextPieceType: generatePieceType(),
             holdPieceType: currentPiece.type,
             holdLocked: true
           }
         }
 
         return {
-          currentPiece: getCurrentPiece(holdPieceType),
+          currentPiece: createCurrentPiece(holdPieceType),
           holdPieceType: currentPiece.type,
           holdLocked: true
         }
