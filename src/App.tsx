@@ -470,11 +470,33 @@ const BoardContainer = styled.div`
   margin: 10px;
 `
 
-const NextContainer = styled.div`
-  margin: 10px;
-  height: 100px;
+const PreviewBoard = styled.div`
   width: 100px;
+  height: 100px;
+  margin: 10px;
 `
+
+const Preview = ({ type }: { type: PieceType | null }) => {
+  if (!type) {
+    return null
+  }
+
+  return (
+    <MatrixTable>
+      {
+        generatePiece(type).map((line, i) => (
+          <tr>
+            {
+              line.map((p, j) => (
+                <Block key={`preview-block-${i}-${j}`} type={p ? type : ""} />
+              ))
+            }
+          </tr>
+        ))
+      }
+    </MatrixTable>
+  )
+}
 
 function App() {
   const {
@@ -501,20 +523,14 @@ function App() {
           <Board matrix={viewMatrix()} />
         </BoardContainer>
         <div>
-          <NextContainer>
-            <MatrixTable>
-              {getCurrentPiece(nextPieceType).piece.map((line, i) => (
-                <tr>
-                  {
-                    line.map((n, j) => (
-                      <Block key={`review-block-${i}-${j}`} type={n > 0 ? nextPieceType : ""} />
-                    ))
-                  }
-                </tr>
-              ))}
-            </MatrixTable>
-          </NextContainer>
-          <h5>hold: {holdPieceType}</h5>
+          <h5>next: </h5>
+          <PreviewBoard>
+            <Preview type={nextPieceType} />
+          </PreviewBoard>
+          <h5>hold: </h5>
+          <PreviewBoard>
+            <Preview type={holdPieceType} />
+          </PreviewBoard>
           <h5>level: {level}</h5>
           <h5>score: {score}</h5>
         </div>
