@@ -115,29 +115,34 @@ const getTickSeconds = (level: number): number => (0.8 - (level - 1) * 0.007) **
 const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
 const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
 
-const move = (currentPiece: CurrentPiece, func: ([x, y]: [number, number]) => [number, number]) => {
+const moveDown = (currentPiece: CurrentPiece): CurrentPiece => {
+  const [x, y] = currentPiece.position
   return {
     ...currentPiece,
-    position: func(currentPiece.position)
+    position: [x + 1, y]
   }
 }
 
-const moveDown = (currentPiece: CurrentPiece) => {
-  return move(currentPiece, ([x, y]) => [x + 1, y])
+const moveLeft = (currentPiece: CurrentPiece): CurrentPiece => {
+  const [x, y] = currentPiece.position
+  return {
+    ...currentPiece,
+    position: [x, y - 1]
+  }
 }
 
-const moveLeft = (currentPiece: CurrentPiece) => {
-  return move(currentPiece, ([x, y]) => [x, y - 1])
-}
-
-const moveRight = (currentPiece: CurrentPiece) => {
-  return move(currentPiece, ([x, y]) => [x, y + 1])
+const moveRight = (currentPiece: CurrentPiece): CurrentPiece => {
+  const [x, y] = currentPiece.position
+  return {
+    ...currentPiece,
+    position: [x, y + 1]
+  }
 }
 
 const hardDrop = (currentPiece: CurrentPiece, matrix: Matrix): CurrentPiece => {
   const droppedPiece: CurrentPiece = {
     ...currentPiece,
-    position: [currentPiece.position[0], currentPiece.position[1]]
+    position: [...currentPiece.position]
   }
   while (isEmptyPosition(droppedPiece, matrix)) {
     droppedPiece.position[0] += 1
