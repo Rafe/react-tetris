@@ -423,21 +423,21 @@ const useGame = create<State>((set, get) => ({
 }))
 
 const BLOCK_COLORS: { [key: string]: string } = {
-  I: "blue",
-  S: "yellow",
-  L: "silver",
-  J: "purple",
-  T: "red",
-  Z: "green",
-  O: "brown",
-  R: "#DDD"
+  I: "#54F0F0",
+  S: "#57F000",
+  L: "#F0A000",
+  J: "#0100F0",
+  T: "#A001F0",
+  Z: "#F00B00",
+  O: "#F0F000",
+  R: "#DDDDDD"
 }
 
 const Block = styled.td<{type: string}>`
-  border: 1px solid black;
+  border: ${({type}) => type === null ? "1px #142962 solid" : "1px solid black"};
   width: 20px;
   height: 20px;
-  background-color: ${props => BLOCK_COLORS[props.type] || "#EEE"}
+  background-color: ${props => BLOCK_COLORS[props.type] || "#142962"}
 `
 
 const MatrixTable = styled.table`
