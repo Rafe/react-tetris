@@ -505,14 +505,15 @@ const Preview = ({ type }: { type: PieceType | null }) => {
 
 function App() {
   const {
-    gameState,
-    gameLoop,
     bindController,
-    level,
-    score,
-    nextPieceType,
+    controller,
+    gameLoop,
+    gameState,
     holdPieceType,
-    viewMatrix,
+    level,
+    nextPieceType,
+    score,
+    viewMatrix
   } = useGame(state => state , shallow)
 
   useEffect(gameLoop, [gameLoop, gameState, level])
@@ -540,6 +541,17 @@ function App() {
           <h5>score: {score}</h5>
         </div>
       </Container>
+      <div>
+        <button onClick={() => controller.ArrowUp()}>UP</button>
+        <button onClick={() => controller.ArrowLeft()}>LEFT</button>
+        <button onClick={() => controller.ArrowRight()}>RIGHT</button>
+        <button onClick={() => controller.ArrowDown()}>DOWN</button>
+        <button onClick={() => controller.Space()}>Space</button>
+        <button onClick={() => controller.KeyZ()}>Z</button>
+        <button onClick={() => controller.KeyX()}>X</button>
+        <button onClick={() => controller.KeyC()}>C</button>
+        <button onClick={() => controller.Enter()}>Enter</button>
+      </div>
     </Wrapper>
   );
 }
