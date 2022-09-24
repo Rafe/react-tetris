@@ -542,15 +542,15 @@ function App() {
         </div>
       </Container>
       <div>
-        <button onClick={() => controller.ArrowUp()}>UP</button>
-        <button onClick={() => controller.ArrowLeft()}>LEFT</button>
-        <button onClick={() => controller.ArrowRight()}>RIGHT</button>
-        <button onClick={() => controller.ArrowDown()}>DOWN</button>
-        <button onClick={() => controller.Space()}>Space</button>
-        <button onClick={() => controller.KeyZ()}>Z</button>
-        <button onClick={() => controller.KeyX()}>X</button>
-        <button onClick={() => controller.KeyC()}>C</button>
-        <button onClick={() => controller.Enter()}>Enter</button>
+        <button onClick={controller.ArrowUp}>UP</button>
+        <button onClick={controller.ArrowLeft}>LEFT</button>
+        <button onClick={controller.ArrowRight}>RIGHT</button>
+        <button onClick={controller.ArrowDown}>DOWN</button>
+        <button onClick={controller.Space}>Space</button>
+        <button onClick={controller.KeyZ}>Z</button>
+        <button onClick={controller.KeyX}>X</button>
+        <button onClick={controller.KeyC}>C</button>
+        <button onClick={controller.Enter}>Enter</button>
       </div>
     </Wrapper>
   );
