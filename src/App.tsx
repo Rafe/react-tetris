@@ -444,7 +444,7 @@ const Block = styled.td<{type: string}>`
   background-color: ${props => BLOCK_COLORS[props.type] || "#142962"}
 `
 
-const MatrixTable = styled.table<{shaken: boolean | null }>`
+const MatrixTable = styled.table<{shaken?: boolean}>`
   border-collapse: collapse;
   transform: ${({shaken}) => shaken ? "translateY(5px)" : "none"};
 `
@@ -476,7 +476,7 @@ const Preview = ({ type }: { type: PieceType | null }) => {
   }
 
   return (
-    <MatrixTable shaken={false}>
+    <MatrixTable>
       {
         generatePiece(type).map((line, i) => (
           <tr>
