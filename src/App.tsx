@@ -25,12 +25,13 @@ interface State {
   line: number
   score: number
   controller: any
-  bindController: any
+  bindController: () => void
 
   matrix: Matrix
   nextPieceType: PieceType
   holdPieceType: PieceType | null
   holdLocked: boolean
+  shaken: boolean
   currentPiece: CurrentPiece
 
   gameLoop: () => () => void
@@ -285,7 +286,8 @@ const initializeGame = () => ({
   currentPiece: createCurrentPiece(generatePieceType()),
   nextPieceType: generatePieceType(),
   holdPieceType: null,
-  holdLocked: false
+  holdLocked: false,
+  shaken: false
 })
 
 const lockPiece = (currentPiece: CurrentPiece, matrix: Matrix, nextPieceType: PieceType, line: number, score: number) => {
@@ -388,9 +390,11 @@ const useGame = create<State>((set, get) => ({
       })
     },
     Space: () => {
-      set(({ currentPiece, matrix, line, score, nextPieceType }) =>
-        lockPiece(hardDrop(currentPiece, matrix), matrix, nextPieceType, line, score)
-      )
+      set(({ currentPiece, matrix, line, score, nextPieceType }) => ({
+        ...lockPiece(hardDrop(currentPiece, matrix), matrix, nextPieceType, line, score),
+        shaken: true
+      }))
+      setTimeout(() => set(() => ({ shaken: false })), 100)
     },
     Enter: () => {
       set(({ gameState }) => {
@@ -440,25 +444,10 @@ const Block = styled.td<{type: string}>`
   background-color: ${props => BLOCK_COLORS[props.type] || "#142962"}
 `
 
-const MatrixTable = styled.table`
+const MatrixTable = styled.table<{shaken: boolean | null }>`
   border-collapse: collapse;
+  transform: ${({shaken}) => shaken ? "translateY(5px)" : "none"};
 `
-
-const Board = ({matrix}: {matrix: string[][]}) => (
-  <MatrixTable>
-    {
-    matrix.map((line, i) => (
-      <tr key={`line-${i}`}>
-        {
-          line.map((type, j) => (
-            <Block key={`block-${i}-${j}`} type={type} />
-          ))
-        }
-      </tr>
-    ))
-    }
-  </MatrixTable>
-)
 
 const Wrapper = styled.div`
   display: flex;
@@ -487,7 +476,7 @@ const Preview = ({ type }: { type: PieceType | null }) => {
   }
 
   return (
-    <MatrixTable>
+    <MatrixTable shaken={false}>
       {
         generatePiece(type).map((line, i) => (
           <tr>
@@ -513,7 +502,8 @@ function App() {
     level,
     nextPieceType,
     score,
-    viewMatrix
+    viewMatrix,
+    shaken
   } = useGame(state => state , shallow)
 
   useEffect(gameLoop, [gameLoop, gameState, level])
@@ -526,7 +516,19 @@ function App() {
       </header>
       <Container>
         <BoardContainer>
-          <Board matrix={viewMatrix()} />
+          <MatrixTable shaken={shaken}>
+            {
+              viewMatrix().map((line, i) => (
+                <tr key={`line-${i}`}>
+                  {
+                    line.map((type, j) => (
+                      <Block key={`block-${i}-${j}`} type={type} />
+                    ))
+                  }
+                </tr>
+              ))
+            }
+          </MatrixTable>
         </BoardContainer>
         <div>
           <h5>next: </h5>
