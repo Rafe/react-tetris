@@ -439,6 +439,8 @@ const BLOCK_COLORS: { [key: string]: string } = {
 
 const Block = styled.td<{type: string}>`
   border: ${({type}) => type === null ? "1px #142962 solid" : "1px solid black"};
+  margin: 0;
+  padding: 0;
   width: 20px;
   height: 20px;
   background-color: ${props => BLOCK_COLORS[props.type] || "#142962"}
