@@ -443,7 +443,7 @@ const Block = styled.td<{type: string}>`
   padding: 0;
   width: 20px;
   height: 20px;
-  background-color: ${props => BLOCK_COLORS[props.type] || "#142962"}
+  background-color: ${props => BLOCK_COLORS[props.type] || "#142962"};
 `
 
 const MatrixTable = styled.table<{shaken?: boolean}>`
