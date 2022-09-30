@@ -434,11 +434,19 @@ const BLOCK_COLORS: { [key: string]: string } = {
   T: "#A001F0",
   Z: "#F00B00",
   O: "#F0F000",
-  R: "#DDDDDD"
+  R: "#142962"
 }
 
 const Block = styled.td<{type: string}>`
-  border: ${({type}) => type === null ? "1px #142962 solid" : "1px solid black"};
+  border: ${({type}) => {
+    if (type === "R") {
+      return "1px double white;"
+    } else if (type) {
+      return "1px solid black;"
+    } else {
+      return "1px solid #142962;"
+    }
+  }}
   margin: 0;
   padding: 0;
   width: 20px;
