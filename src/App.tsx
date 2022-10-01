@@ -300,44 +300,15 @@ const initializeGame = () => ({
   shaken: false
 })
 
-const lockPiece = (currentPiece: CurrentPiece, matrix: Matrix, nextPieceType: PieceType, line: number, score: number) => {
-  const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, currentPiece))
-
-  const newLine = line + lineCleared
-  const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
-  const nextPiece = createCurrentPiece(nextPieceType);
-
-  return {
-    currentPiece: nextPiece,
-    matrix: newMatrix,
-    line: newLine,
-    holdLocked: false,
-    nextPieceType: generatePieceType(),
-    gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
-    level,
-    score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) 
-  }
-}
-
 const useGame = create<State>((set, get) => ({
   ...initializeGame(),
   gameLoop() {
     const ref = setInterval(() => {
-      set(({matrix, gameState, line, score, currentPiece, nextPieceType}) => {
-        if (gameState === GameState.GAME_OVER || gameState === GameState.PAUSE) {
-          return {}
-        }
+      if (get().gameState !== GameState.START) {
+        return
+      }
 
-        const movedPiece = tryMove(moveDown)(currentPiece, matrix)
-
-        if (!isSamePosition(currentPiece, movedPiece)) {
-          return {
-            currentPiece: movedPiece
-          }
-        }
-
-        return lockPiece(currentPiece, matrix, nextPieceType, line, score)
-      })
+      get().controller.ArrowDown()
     }, 1000 * getTickSeconds(get().level))
 
     return () => {
@@ -356,16 +327,40 @@ const useGame = create<State>((set, get) => ({
     ArrowUp: () => set(({ currentPiece, matrix }) => ({ currentPiece: rotateRight(currentPiece, matrix) })),
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft)(state.currentPiece, state.matrix) })),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight)(state.currentPiece, state.matrix)})),
-    ArrowDown: () => set(({ matrix, currentPiece, line, score, nextPieceType }) => {
-      const movedPiece = tryMove(moveDown)(currentPiece, matrix)
+    ArrowDown: (drop = false) => set(({ matrix, currentPiece, line, score, nextPieceType }) => {
+      const movedPiece = drop ? hardDrop(currentPiece, matrix) : tryMove(moveDown)(currentPiece, matrix)
 
-      if (!isSamePosition(currentPiece, movedPiece)) {
+      if (!drop && !isSamePosition(currentPiece, movedPiece)) {
         return {
           currentPiece: movedPiece
         }
       }
 
-      return lockPiece(currentPiece, matrix, nextPieceType, line, score)
+      const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
+
+      const newLine = line + lineCleared
+      const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
+      const nextPiece = createCurrentPiece(nextPieceType);
+
+      let animation: any = {}
+      if (drop) {
+        animation["shaken"] = true;
+        setTimeout(() => {
+          set(({ shaken }) => ({ shaken: false }))
+        }, 100)
+      }
+
+      return {
+        currentPiece: nextPiece,
+        matrix: newMatrix,
+        line: newLine,
+        holdLocked: false,
+        nextPieceType: generatePieceType(),
+        gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
+        level,
+        score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) ,
+        ...animation
+      }
     }),
     KeyZ: () => {
       set(({ currentPiece, matrix}) => ({
@@ -400,11 +395,7 @@ const useGame = create<State>((set, get) => ({
       })
     },
     Space: () => {
-      set(({ currentPiece, matrix, line, score, nextPieceType }) => ({
-        ...lockPiece(hardDrop(currentPiece, matrix), matrix, nextPieceType, line, score),
-        shaken: true
-      }))
-      setTimeout(() => set(() => ({ shaken: false })), 100)
+      get().controller.ArrowDown(true)
     },
     Enter: () => {
       set(({ gameState }) => {
@@ -571,7 +562,7 @@ function App() {
         <button onClick={controller.ArrowUp}>UP</button>
         <button onClick={controller.ArrowLeft}>LEFT</button>
         <button onClick={controller.ArrowRight}>RIGHT</button>
-        <button onClick={controller.ArrowDown}>DOWN</button>
+        <button onClick={() => controller.ArrowDown() }>DOWN</button>
         <button onClick={controller.Space}>Space</button>
         <button onClick={controller.KeyZ}>Z</button>
         <button onClick={controller.KeyX}>X</button>
