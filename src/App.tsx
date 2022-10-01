@@ -35,7 +35,7 @@ interface State {
   currentPiece: CurrentPiece
 
   gameLoop: () => () => void
-  viewMatrix: () => PieceType[][]
+  viewMatrix: () => Matrix
 }
 
 const LINES_EACH_LEVEL = 20
@@ -113,8 +113,8 @@ const createCurrentPiece = (type: PieceType): CurrentPiece => {
 }
 
 const getTickSeconds = (level: number): number => (0.8 - (level - 1) * 0.007) ** (level - 1)
-const buildLine = () => new Array(MATRIX_WIDTH).fill(null)
-const buildMatrix = () => new Array(MATRIX_HEIGHT).fill(null).map(() => buildLine())
+const buildLine = (width = MATRIX_WIDTH): PieceType[] => new Array(width).fill(null)
+const buildMatrix = (height = MATRIX_HEIGHT, width = MATRIX_WIDTH): Matrix => new Array(height).fill(null).map(() => buildLine(width))
 
 const moveDown = (currentPiece: CurrentPiece): CurrentPiece => {
   const [x, y] = currentPiece.position
@@ -238,7 +238,7 @@ const rotateRight = (currentPiece: CurrentPiece, matrix: Matrix) =>
 const rotateLeft = (currentPiece: CurrentPiece, matrix: Matrix) =>
   tryMove(rotate({ clockwise: false }))(currentPiece, matrix)
 
-const addPieceTo = (matrix: any[][], currentPiece: CurrentPiece): any[][] => {
+const addPieceTo = (matrix: Matrix, currentPiece: CurrentPiece): Matrix => {
   const [x, y] = currentPiece.position
   if (x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length) {
     for (let i = 0; i < currentPiece.piece.length; i++) {
@@ -260,11 +260,21 @@ const isSamePosition = (currentPiece: CurrentPiece, movedPiece: CurrentPiece): b
   return x === mx && y === my
 }
 
-const clearLines = (matrix: any[][]): [number, any[][]] => {
-  let lineCleared = 0
-  const newMatrix = matrix.reduce((result, line) => {
+const findLinesToClear = (matrix: Matrix): boolean[] => (
+  matrix.reduce((result, line, i) => {
     if (line.every((block) => block)) {
-      lineCleared += 1
+      result[i] = true
+    }
+
+    return result
+  }, new Array(matrix.length).fill(false))
+)
+
+const clearLines = (matrix: Matrix): [number, Matrix] => {
+  const linesToClear = findLinesToClear(matrix)
+
+  const newMatrix = matrix.reduce<Matrix>((result, line, i) => {
+    if (linesToClear[i]) {
       result.unshift(buildLine())
     } else {
       result.push(line)
@@ -273,7 +283,7 @@ const clearLines = (matrix: any[][]): [number, any[][]] => {
     return result
   }, [])
 
-  return [lineCleared, newMatrix]
+  return [linesToClear.filter(l => l).length, newMatrix]
 }
 
 const initializeGame = () => ({
