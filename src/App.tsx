@@ -487,17 +487,19 @@ const Preview = ({ type }: { type: PieceType | null }) => {
 
   return (
     <MatrixTable>
-      {
-        generatePiece(type).map((line, i) => (
-          <tr>
-            {
-              line.map((p, j) => (
-                <Block key={`preview-block-${i}-${j}`} type={p ? type : ""} />
-              ))
-            }
-          </tr>
-        ))
-      }
+      <tbody>
+        {
+          generatePiece(type).map((line, i) => (
+            <tr key={`preview-row-${i}`}>
+              {
+                line.map((p, j) => (
+                  <Block key={`preview-block-${i}-${j}`} type={p ? type : ""} />
+                ))
+              }
+            </tr>
+          ))
+        }
+      </tbody>
     </MatrixTable>
   )
 }
@@ -527,17 +529,19 @@ function App() {
       <Container>
         <BoardContainer>
           <MatrixTable shaken={shaken}>
-            {
-              viewMatrix().map((line, i) => (
-                <tr key={`line-${i}`}>
-                  {
-                    line.map((type, j) => (
-                      <Block key={`block-${i}-${j}`} type={type} />
-                    ))
-                  }
-                </tr>
-              ))
-            }
+            <tbody>
+              {
+                viewMatrix().map((line, i) => (
+                  <tr key={`line-${i}`}>
+                    {
+                      line.map((type, j) => (
+                        <Block key={`block-${i}-${j}`} type={type} />
+                      ))
+                    }
+                  </tr>
+                ))
+              }
+            </tbody>
           </MatrixTable>
         </BoardContainer>
         <div>
