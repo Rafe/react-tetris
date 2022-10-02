@@ -61,10 +61,7 @@ const generatePiece = (type: PieceType): Piece => {
   switch(type) {
     case "I":
       return [
-        [1],
-        [2],
-        [1],
-        [1],
+        [1, 2, 1, 1]
       ]
     case "L":
       return [
@@ -117,7 +114,7 @@ const createCurrentPiece = (type: PieceType): CurrentPiece => {
 }
 const ENTRY_PIECE: CurrentPiece = {
   ...createCurrentPiece("O"),
-  position: [0, 4]
+  position: [-1, 4]
 }
 
 const getTickSeconds = (level: number): number => (0.8 - (level - 1) * 0.007) ** (level - 1)
