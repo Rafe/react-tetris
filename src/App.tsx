@@ -572,12 +572,30 @@ const Container = styled.div`
 
 const BoardContainer = styled.div`
   margin: 10px;
+  position: relative;
 `
 
 const PreviewBoard = styled.div`
   width: 100px;
   height: 100px;
   margin: 10px;
+`
+
+const GameStateOverlay = styled.div`
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 0;
+  top: 0; 
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+`
+
+const GameStateContainer = styled.div`
+  color: #FFF;
+  text-align: center;
 `
 
 const Preview = ({ type }: { type: PieceType | null }) => {
@@ -633,6 +651,22 @@ function App() {
       </header>
       <Container>
         <BoardContainer>
+          {gameState === GameState.GAME_OVER && (
+            <GameStateOverlay>
+              <GameStateContainer>
+                <h1>Game Over</h1>
+                <p>Press "Enter" to restart</p>
+              </GameStateContainer>
+            </GameStateOverlay>
+          )}
+          {gameState === GameState.PAUSE && (
+            <GameStateOverlay>
+              <GameStateContainer>
+                <h1>Paused</h1>
+                <p>Press "Enter" to continue</p>
+              </GameStateContainer>
+            </GameStateOverlay>
+          )}
           <MatrixTable shaken={shaken}>
             <tbody>
               {
