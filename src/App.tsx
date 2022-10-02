@@ -110,7 +110,7 @@ const createCurrentPiece = (type: PieceType): CurrentPiece => {
   const piece = generatePiece(type)
   return {
     type,
-    position: [-1, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
+    position: [-2, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
     piece,
     tick: 0,
     totalTick: 0
@@ -169,15 +169,15 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean =>
       const px = position[0] + x
       const py = position[1] + y
 
-      if (!piece[x][y] || px < 0) {
+      if (!piece[x][y]) {
         continue
       }
 
-      if (px < 0 || px >= MATRIX_HEIGHT) {
+      if (px >= MATRIX_HEIGHT) {
         return false
       } else if (py < 0 || py >= MATRIX_WIDTH) {
         return false
-      } else if (matrix[px][py]) {
+      } else if (matrix[px] && matrix[px][py]) {
         return false
       }
     }
@@ -189,10 +189,6 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean =>
 const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
   return (currentPiece, matrix) => {
     let movedPiece = moveMethod(currentPiece)
-
-    if (movedPiece.position[0] < 0) {
-      movedPiece.position[0] += 1
-    }
 
     if (isEmptyPosition(movedPiece, matrix)) {
       return movedPiece
