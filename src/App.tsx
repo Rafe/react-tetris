@@ -324,16 +324,16 @@ const useGame = create<State>((set, get) => ({
       return matrix;
     }
 
+    const viewMatrix = matrix.map(row => [...row])
+
+    if (gameState === GameState.GAME_OVER) {
+      return addPieceTo(viewMatrix, currentPiece)
+    }
+
     const reviewPiece = hardDrop(currentPiece, matrix)
     reviewPiece.type = "R"
 
-    const viewMatrix = addPieceTo(matrix.map(row => [...row]), currentPiece)
-
-    if (gameState === GameState.GAME_OVER) {
-      return viewMatrix
-    }
-
-    return addPieceTo(viewMatrix, reviewPiece)
+    return addPieceTo(addPieceTo(viewMatrix, reviewPiece), currentPiece)
   },
   controller: {
     ArrowUp: () => set(({ currentPiece, matrix }) => ({ currentPiece: rotateRight(currentPiece, matrix) })),
