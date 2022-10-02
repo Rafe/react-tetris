@@ -30,6 +30,7 @@ interface State {
   matrix: Matrix
   nextPieceType: PieceType
   holdPieceType: PieceType | null
+  clearedLines: boolean[]
   holdLocked: boolean
   shaken: boolean
   currentPiece: CurrentPiece
@@ -295,6 +296,7 @@ const initializeGame = () => ({
   matrix: buildMatrix(),
   currentPiece: createCurrentPiece(generatePieceType()),
   nextPieceType: generatePieceType(),
+  clearedLines: new Array(MATRIX_WIDTH).fill(false),
   holdPieceType: null,
   holdLocked: false,
   shaken: false
@@ -350,36 +352,54 @@ const useGame = create<State>((set, get) => ({
         }
       }
 
-      const [clearedLines, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
-      const lineCleared = clearedLines.filter(l => l).length
-
-      const newLine = line + lineCleared
-      const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
-      const nextPiece = createCurrentPiece(nextPieceType);
-
       let animation: any = {}
       let animationReset: any = {}
       if (drop) {
         animation["shaken"] = true
-        animationReset["shaken"] = false
+        setTimeout(() => {
+          set(() => ({
+            shaken: false
+          }))
+        }, 100)
       }
 
-      if (lineCleared) {
-        animationReset["currentPiece"] = nextPiece
+      // if line cleared, set line cleared animation, delay pop for 0.5 sec, ease transition animation
+      // if line not cleared, return new matrix
+      // if drop, play shaken animation
+
+      const [clearedLines, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
+      const lineCleared = clearedLines.filter(l => l).length
+      const nextPiece = createCurrentPiece(nextPieceType);
+      const newGameState = isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER
+
+      if (!lineCleared) {
+        return {
+          holdLocked: false,
+          currentPiece: nextPiece,
+          nextPieceType: generatePieceType(),
+          matrix,
+          gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
+          ...animation
+        }
       }
 
       setTimeout(() => {
         set(() => ({
           holdLocked: false,
-          gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
-          ...animationReset,
+          currentPiece: nextPiece,
+          nextPieceType: generatePieceType(),
+          matrix: newMatrix,
+          gameState: newGameState,
+          clearedLines: new Array(MATRIX_WIDTH).fill(false),
         }))
-      }, 100)
+      }, 400)
+
+      const newLine = line + lineCleared
+      const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
 
       return {
-        currentPiece: lineCleared ? null : nextPiece,
-        nextPieceType: generatePieceType(),
-        matrix: newMatrix,
+        currentPiece: null,
+        clearedLines,
         line: newLine,
         level,
         score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) ,
@@ -462,7 +482,7 @@ const BLOCK_COLORS: { [key: string]: string } = {
   R: "#142962"
 }
 
-const Block = styled.td<{type: string}>`
+const Block = styled.td<{type: string, clear?: boolean}>`
   border: ${({type}) => {
     if (type === "R") {
       return "1px double white"
@@ -477,6 +497,10 @@ const Block = styled.td<{type: string}>`
   width: 20px;
   height: 20px;
   background-color: ${props => BLOCK_COLORS[props.type] || "#142962"};
+  ${({clear}) => clear && `
+    transition: background-color 0.4s ease;
+    background-color: #FFF;
+  `}
 `
 
 const MatrixTable = styled.table<{shaken?: boolean}>`
@@ -533,6 +557,7 @@ function App() {
   const {
     bindController,
     controller,
+    clearedLines,
     gameLoop,
     gameState,
     holdPieceType,
@@ -560,7 +585,7 @@ function App() {
                   <tr key={`line-${i}`}>
                     {
                       line.map((type, j) => (
-                        <Block key={`block-${i}-${j}`} type={type} />
+                        <Block key={`block-${i}-${j}`} type={type} clear={clearedLines[i]} />
                       ))
                     }
                   </tr>
