@@ -107,7 +107,7 @@ const createCurrentPiece = (type: PieceType): CurrentPiece => {
   const piece = generatePiece(type)
   return {
     type,
-    position: [0, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
+    position: [-1, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
     piece
   }
 }
@@ -159,12 +159,12 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean =>
 
   for(let x = 0; x < piece.length; x++) {
     for(let y = 0; y < piece[0].length; y++) {
-      if (!piece[x][y]) {
-        continue
-      }
-
       const px = position[0] + x
       const py = position[1] + y
+
+      if (!piece[x][y] || px < 0) {
+        continue
+      }
 
       if (px < 0 || px >= MATRIX_HEIGHT) {
         return false
@@ -240,12 +240,12 @@ const rotateLeft = (currentPiece: CurrentPiece, matrix: Matrix) =>
 
 const addPieceTo = (matrix: Matrix, currentPiece: CurrentPiece): Matrix => {
   const [x, y] = currentPiece.position
-  if (x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length) {
-    for (let i = 0; i < currentPiece.piece.length; i++) {
-      for (let j = 0; j < currentPiece.piece[i].length; j++) {
-        if (x + i < matrix.length && y + j < matrix[0].length && currentPiece.piece[i][j]) {
-          matrix[x + i][y + j] = currentPiece.type
-        }
+  for (let i = 0; i < currentPiece.piece.length; i++) {
+    for (let j = 0; j < currentPiece.piece[i].length; j++) {
+      const px = x + i
+      const py = y + j
+      if (px >= 0 && px < matrix.length && py >= 0 && py < matrix[0].length && currentPiece.piece[i][j]) {
+        matrix[px][py] = currentPiece.type
       }
     }
   }
