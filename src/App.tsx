@@ -147,6 +147,15 @@ const moveRight = (currentPiece: CurrentPiece): CurrentPiece => {
   }
 }
 
+const moveUp = (currentPiece: CurrentPiece): CurrentPiece => {
+  const [x, y] = currentPiece.position
+  return {
+    ...currentPiece,
+    position: [x - 1, y],
+    tick: 0
+  }
+}
+
 const hardDrop = (currentPiece: CurrentPiece, matrix: Matrix): CurrentPiece => {
   const droppedPiece: CurrentPiece = {
     ...currentPiece,
@@ -188,11 +197,35 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean =>
 
 const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
   return (currentPiece, matrix) => {
-    let movedPiece = moveMethod(currentPiece)
+    const movedPiece = moveMethod(currentPiece)
 
     if (isEmptyPosition(movedPiece, matrix)) {
       return movedPiece
     } else {
+      return currentPiece
+    }
+  }
+}
+
+const tryKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
+  return (currentPiece, matrix) => {
+    const movedPiece = moveMethod(currentPiece)
+
+    if (isEmptyPosition(movedPiece, matrix)) {
+      return movedPiece
+    } else {
+      if (isEmptyPosition(moveLeft(movedPiece), matrix)) {
+        return moveLeft(movedPiece)
+      }
+
+      if (isEmptyPosition(moveRight(movedPiece), matrix)) {
+        return moveRight(movedPiece)
+      }
+
+      if (isEmptyPosition(moveUp(movedPiece), matrix)) {
+        return moveUp(movedPiece)
+      }
+
       return currentPiece
     }
   }
@@ -237,10 +270,10 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
 }
 
 const rotateRight = (currentPiece: CurrentPiece, matrix: Matrix) =>
-  tryMove(rotate({ clockwise: true }))(currentPiece, matrix)
+  tryKick(rotate({ clockwise: true }))(currentPiece, matrix)
 
 const rotateLeft = (currentPiece: CurrentPiece, matrix: Matrix) =>
-  tryMove(rotate({ clockwise: false }))(currentPiece, matrix)
+  tryKick(rotate({ clockwise: false }))(currentPiece, matrix)
 
 const addPieceTo = (matrix: Matrix, currentPiece: CurrentPiece): Matrix => {
   const [x, y] = currentPiece.position
