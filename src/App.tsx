@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import create from "zustand"
 import shallow from "zustand/shallow"
-import styled from "styled-components"
+import styled, { keyframes, css } from "styled-components"
 
 enum GameState {
   START,
@@ -32,7 +32,7 @@ interface State {
   matrix: Matrix
   nextPieceType: PieceType
   holdPieceType: PieceType | null
-  clearedLines: boolean[]
+  linesToClear: boolean[]
   holdLocked: boolean
   shaken: boolean
   currentPiece: CurrentPiece
@@ -43,8 +43,10 @@ interface State {
 
 const LINES_EACH_LEVEL = 20
 const BASE_SCORE_FOR_LINES = [0, 40, 100, 300, 1200]
+const MATRIX_WIDTH = 10
+const MATRIX_HEIGHT = 20
 
-// when game state is GAME_OVER or PAUSE, enter start to start the game
+// when game state is GAME_OVER or PAUSE, press enter to start the game
 // when game state is START, running game loop 
 //   the current piece fall by game speed
 //   when falling, show the future position that the piece will fall
@@ -54,9 +56,6 @@ const BASE_SCORE_FOR_LINES = [0, 40, 100, 300, 1200]
 //   then pop next piece from queue, when there is no space for piece, set game state to GAME_OVER
 //   while falling, controller take control of the piece
 //     left, right, down, drop, rotate right, rotate left, pause
-
-const MATRIX_WIDTH = 10
-const MATRIX_HEIGHT = 20
 
 const generatePiece = (type: PieceType): Piece => {
   switch(type) {
@@ -115,6 +114,10 @@ const createCurrentPiece = (type: PieceType): CurrentPiece => {
     tick: 0,
     totalTick: 0
   }
+}
+const ENTRY_PIECE: CurrentPiece = {
+  ...createCurrentPiece("O"),
+  position: [0, 4]
 }
 
 const getTickSeconds = (level: number): number => (0.8 - (level - 1) * 0.007) ** (level - 1)
@@ -207,7 +210,7 @@ const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPie
   }
 }
 
-const tryKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
+const tryWallKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
   return (currentPiece, matrix) => {
     const movedPiece = moveMethod(currentPiece)
 
@@ -231,7 +234,8 @@ const tryKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPie
   }
 }
 
-// when transform, record the xy of pivot, and transformed xy of pivot, calculate to keep x1 == x2 + x, y1 == y2 + y
+// when transform, record the xy of pivot (value === 2),
+// and transformed along xy to keep x1 == x2 + x, y1 == y2 + y
 const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentPiece): CurrentPiece => {
   const { piece } = currentPiece
   const height = piece.length
@@ -270,10 +274,10 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
 }
 
 const rotateRight = (currentPiece: CurrentPiece, matrix: Matrix) =>
-  tryKick(rotate({ clockwise: true }))(currentPiece, matrix)
+  tryWallKick(rotate({ clockwise: true }))(currentPiece, matrix)
 
 const rotateLeft = (currentPiece: CurrentPiece, matrix: Matrix) =>
-  tryKick(rotate({ clockwise: false }))(currentPiece, matrix)
+  tryWallKick(rotate({ clockwise: false }))(currentPiece, matrix)
 
 const addPieceTo = (matrix: Matrix, currentPiece: CurrentPiece): Matrix => {
   const [x, y] = currentPiece.position
@@ -332,7 +336,7 @@ const initializeGame = () => ({
   matrix: buildMatrix(),
   currentPiece: createCurrentPiece(generatePieceType()),
   nextPieceType: generatePieceType(),
-  clearedLines: new Array(MATRIX_WIDTH).fill(false),
+  linesToClear: new Array(MATRIX_WIDTH).fill(false),
   holdPieceType: null,
   holdLocked: false,
   shaken: false
@@ -375,20 +379,20 @@ const useGame = create<State>((set, get) => ({
     ArrowUp: () => set(({ currentPiece, matrix }) => ({ currentPiece: rotateRight(currentPiece, matrix) })),
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft)(state.currentPiece, state.matrix) })),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight)(state.currentPiece, state.matrix)})),
-    ArrowDown: (drop = false) => set(({ matrix, currentPiece, line, level, score, nextPieceType }) => {
+    ArrowDown: (isHardDrop = false) => set(({ matrix, currentPiece, line, level, score, nextPieceType }) => {
       if (!currentPiece) {
         return {}
       }
 
-      const movedPiece = drop ? hardDrop(currentPiece, matrix) : tryMove(moveDown)(currentPiece, matrix)
+      const movedPiece = isHardDrop ? hardDrop(currentPiece, matrix) : tryMove(moveDown)(currentPiece, matrix)
 
-      if (!drop && !isSamePosition(currentPiece, movedPiece)) {
+      if (!isHardDrop && !isSamePosition(currentPiece, movedPiece)) {
         return {
           currentPiece: movedPiece,
         };
       }
 
-      if (!drop && currentPiece.tick < 0.5 && currentPiece.totalTick < 5) {
+      if (!isHardDrop && currentPiece.tick < 0.5 && currentPiece.totalTick < 5) {
         const tickSeconds = getTickSeconds(level)
         return {
           currentPiece: {
@@ -400,7 +404,7 @@ const useGame = create<State>((set, get) => ({
       }
 
       let animation: any = {}
-      if (drop) {
+      if (isHardDrop) {
         animation["shaken"] = true
         setTimeout(() => {
           set(() => ({
@@ -409,12 +413,12 @@ const useGame = create<State>((set, get) => ({
         }, 100)
       }
 
-      const [clearedLines, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
-      const lineCleared = clearedLines.filter(l => l).length
+      const [linesToClear, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
+      const lineCleared = linesToClear.filter(l => l).length
       const nextPiece = createCurrentPiece(nextPieceType);
-      const newGameState = isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER
+      const newGameState = isEmptyPosition(ENTRY_PIECE, newMatrix) ? GameState.START : GameState.GAME_OVER
 
-      if (!lineCleared) {
+      if (lineCleared === 0) {
         return {
           holdLocked: false,
           currentPiece: nextPiece,
@@ -435,13 +439,13 @@ const useGame = create<State>((set, get) => ({
           nextPieceType: generatePieceType(),
           matrix: newMatrix,
           gameState: newGameState,
-          clearedLines: new Array(MATRIX_WIDTH).fill(false),
+          linesToClear: new Array(MATRIX_WIDTH).fill(false),
         }))
       }, 400)
 
       return {
         currentPiece: null,
-        clearedLines,
+        linesToClear,
         line: newLine,
         level: newLevel,
         score: score + (newLevel * BASE_SCORE_FOR_LINES[lineCleared]) ,
@@ -524,6 +528,10 @@ const BLOCK_COLORS: { [key: string]: string } = {
   R: "#142962"
 }
 
+const clearAnimation = keyframes`
+  60% { background-color: #FFFFFF }
+  100% { background-color: #142962 }
+`
 const Block = styled.td<{type: string, clear?: boolean}>`
   border: ${({type}) => {
     if (type === "R") {
@@ -539,9 +547,9 @@ const Block = styled.td<{type: string, clear?: boolean}>`
   width: 20px;
   height: 20px;
   background-color: ${props => BLOCK_COLORS[props.type] || "#142962"};
-  ${({clear}) => clear && `
-    transition: background-color 0.4s ease;
-    background-color: #FFF;
+  ${({clear}) => clear && css`
+    animation-name: ${clearAnimation};
+    animation-duration: 0.4s;
   `}
 `
 
@@ -599,7 +607,7 @@ function App() {
   const {
     bindController,
     controller,
-    clearedLines,
+    linesToClear,
     gameLoop,
     gameState,
     holdPieceType,
