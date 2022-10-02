@@ -317,6 +317,11 @@ const useGame = create<State>((set, get) => ({
   },
   viewMatrix() {
     const { matrix, currentPiece } = get()
+
+    if (!currentPiece) {
+      return matrix;
+    }
+
     const viewMatrix = matrix.map(row => [...row])
     const reviewPiece = hardDrop(currentPiece, viewMatrix)
     reviewPiece.type = "R"
@@ -328,6 +333,10 @@ const useGame = create<State>((set, get) => ({
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft)(state.currentPiece, state.matrix) })),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight)(state.currentPiece, state.matrix)})),
     ArrowDown: (drop = false) => set(({ matrix, currentPiece, line, score, nextPieceType }) => {
+      if (!currentPiece) {
+        return {}
+      }
+
       const movedPiece = drop ? hardDrop(currentPiece, matrix) : tryMove(moveDown)(currentPiece, matrix)
 
       if (!drop && !isSamePosition(currentPiece, movedPiece)) {
@@ -343,20 +352,26 @@ const useGame = create<State>((set, get) => ({
       const nextPiece = createCurrentPiece(nextPieceType);
 
       let animation: any = {}
+      let animationReset: any = {}
       if (drop) {
-        animation["shaken"] = true;
-        setTimeout(() => {
-          set(({ shaken }) => ({ shaken: false }))
-        }, 100)
+        animation["shaken"] = true
+        animationReset["shaken"] = false
       }
 
+      setTimeout(() => {
+        set(() => ({
+          currentPiece: nextPiece,
+          holdLocked: false,
+          nextPieceType: generatePieceType(),
+          gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
+          ...animationReset
+        }))
+      }, 100)
+
       return {
-        currentPiece: nextPiece,
+        currentPiece: null,
         matrix: newMatrix,
         line: newLine,
-        holdLocked: false,
-        nextPieceType: generatePieceType(),
-        gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
         level,
         score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) ,
         ...animation
