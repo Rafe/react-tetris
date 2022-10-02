@@ -14,9 +14,11 @@ type PieceType = "I" | "L" | "J" | "Z" | "S" | "O" | "T" | "R"
 type Matrix = PieceType[][]
 
 type CurrentPiece = {
-  type: PieceType,
+  type: PieceType
   position: [number, number]
   piece: Piece
+  tick: number
+  totalTick: number
 }
 
 interface State {
@@ -109,7 +111,9 @@ const createCurrentPiece = (type: PieceType): CurrentPiece => {
   return {
     type,
     position: [-1, Math.floor((MATRIX_WIDTH - piece[0].length)/ 2)],
-    piece
+    piece,
+    tick: 0,
+    totalTick: 0
   }
 }
 
@@ -129,7 +133,8 @@ const moveLeft = (currentPiece: CurrentPiece): CurrentPiece => {
   const [x, y] = currentPiece.position
   return {
     ...currentPiece,
-    position: [x, y - 1]
+    position: [x, y - 1],
+    tick: 0
   }
 }
 
@@ -137,7 +142,8 @@ const moveRight = (currentPiece: CurrentPiece): CurrentPiece => {
   const [x, y] = currentPiece.position
   return {
     ...currentPiece,
-    position: [x, y + 1]
+    position: [x, y + 1],
+    tick: 0
   }
 }
 
@@ -229,7 +235,8 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
   return {
     ...currentPiece,
     position: [originX + px, originY + py],
-    piece: newPiece
+    piece: newPiece,
+    tick: 0
   }
 }
 
@@ -339,7 +346,7 @@ const useGame = create<State>((set, get) => ({
     ArrowUp: () => set(({ currentPiece, matrix }) => ({ currentPiece: rotateRight(currentPiece, matrix) })),
     ArrowLeft: () => set(state => ({ currentPiece: tryMove(moveLeft)(state.currentPiece, state.matrix) })),
     ArrowRight: () => set(state => ({ currentPiece: tryMove(moveRight)(state.currentPiece, state.matrix)})),
-    ArrowDown: (drop = false) => set(({ matrix, currentPiece, line, score, nextPieceType }) => {
+    ArrowDown: (drop = false) => set(({ matrix, currentPiece, line, level, score, nextPieceType }) => {
       if (!currentPiece) {
         return {}
       }
@@ -348,12 +355,22 @@ const useGame = create<State>((set, get) => ({
 
       if (!drop && !isSamePosition(currentPiece, movedPiece)) {
         return {
-          currentPiece: movedPiece
+          currentPiece: movedPiece,
+        };
+      }
+
+      if (!drop && currentPiece.tick < 0.5 && currentPiece.totalTick < 5) {
+        const tickSeconds = getTickSeconds(level)
+        return {
+          currentPiece: {
+            ...movedPiece,
+            tick: movedPiece.tick + tickSeconds,
+            totalTick: movedPiece.totalTick + tickSeconds
+          }
         }
       }
 
       let animation: any = {}
-      let animationReset: any = {}
       if (drop) {
         animation["shaken"] = true
         setTimeout(() => {
@@ -362,10 +379,6 @@ const useGame = create<State>((set, get) => ({
           }))
         }, 100)
       }
-
-      // if line cleared, set line cleared animation, delay pop for 0.5 sec, ease transition animation
-      // if line not cleared, return new matrix
-      // if drop, play shaken animation
 
       const [clearedLines, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
       const lineCleared = clearedLines.filter(l => l).length
@@ -378,10 +391,13 @@ const useGame = create<State>((set, get) => ({
           currentPiece: nextPiece,
           nextPieceType: generatePieceType(),
           matrix,
-          gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
+          gameState: newGameState,
           ...animation
         }
       }
+
+      const newLine = line + lineCleared
+      const newLevel = Math.floor(newLine / LINES_EACH_LEVEL) + 1
 
       setTimeout(() => {
         set(() => ({
@@ -394,15 +410,12 @@ const useGame = create<State>((set, get) => ({
         }))
       }, 400)
 
-      const newLine = line + lineCleared
-      const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
-
       return {
         currentPiece: null,
         clearedLines,
         line: newLine,
-        level,
-        score: score + (level * BASE_SCORE_FOR_LINES[lineCleared]) ,
+        level: newLevel,
+        score: score + (newLevel * BASE_SCORE_FOR_LINES[lineCleared]) ,
         ...animation
       }
     }),
