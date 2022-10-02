@@ -270,7 +270,7 @@ const findLinesToClear = (matrix: Matrix): boolean[] => (
   }, new Array(matrix.length).fill(false))
 )
 
-const clearLines = (matrix: Matrix): [number, Matrix] => {
+const clearLines = (matrix: Matrix): [boolean[], Matrix] => {
   const linesToClear = findLinesToClear(matrix)
 
   const newMatrix = matrix.reduce<Matrix>((result, line, i) => {
@@ -283,7 +283,7 @@ const clearLines = (matrix: Matrix): [number, Matrix] => {
     return result
   }, [])
 
-  return [linesToClear.filter(l => l).length, newMatrix]
+  return [linesToClear, newMatrix]
 }
 
 const initializeGame = () => ({
@@ -345,7 +345,8 @@ const useGame = create<State>((set, get) => ({
         }
       }
 
-      const [lineCleared, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
+      const [clearedLines, newMatrix] = clearLines(addPieceTo(matrix, movedPiece))
+      const lineCleared = clearedLines.filter(l => l).length
 
       const newLine = line + lineCleared
       const level = Math.floor(newLine / LINES_EACH_LEVEL) + 1
@@ -358,18 +359,21 @@ const useGame = create<State>((set, get) => ({
         animationReset["shaken"] = false
       }
 
+      if (lineCleared) {
+        animationReset["currentPiece"] = nextPiece
+      }
+
       setTimeout(() => {
         set(() => ({
-          currentPiece: nextPiece,
           holdLocked: false,
-          nextPieceType: generatePieceType(),
           gameState: isEmptyPosition(nextPiece, newMatrix) ? GameState.START : GameState.GAME_OVER,
-          ...animationReset
+          ...animationReset,
         }))
       }, 100)
 
       return {
-        currentPiece: null,
+        currentPiece: lineCleared ? null : nextPiece,
+        nextPieceType: generatePieceType(),
         matrix: newMatrix,
         line: newLine,
         level,
