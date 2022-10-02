@@ -621,6 +621,10 @@ function App() {
   useEffect(gameLoop, [gameLoop, gameState, level])
   useEffect(bindController)
 
+  const controllerPad = gameState === GameState.START ?
+    controller :
+    { Enter: controller.Enter, ArrowDown: () => {} }
+
   return (
     <Wrapper>
       <header>
@@ -635,7 +639,7 @@ function App() {
                   <tr key={`line-${i}`}>
                     {
                       line.map((type, j) => (
-                        <Block key={`block-${i}-${j}`} type={type} clear={clearedLines[i]} />
+                        <Block key={`block-${i}-${j}`} type={type} clear={linesToClear[i]} />
                       ))
                     }
                   </tr>
@@ -658,15 +662,15 @@ function App() {
         </div>
       </Container>
       <div>
-        <button onClick={controller.ArrowUp}>UP</button>
-        <button onClick={controller.ArrowLeft}>LEFT</button>
-        <button onClick={controller.ArrowRight}>RIGHT</button>
-        <button onClick={() => controller.ArrowDown() }>DOWN</button>
-        <button onClick={controller.Space}>Space</button>
-        <button onClick={controller.KeyZ}>Z</button>
-        <button onClick={controller.KeyX}>X</button>
-        <button onClick={controller.KeyC}>C</button>
-        <button onClick={controller.Enter}>Enter</button>
+        <button onClick={controllerPad.ArrowUp}>UP</button>
+        <button onClick={controllerPad.ArrowLeft}>LEFT</button>
+        <button onClick={controllerPad.ArrowRight}>RIGHT</button>
+        <button onClick={() => controllerPad.ArrowDown()}>DOWN</button>
+        <button onClick={controllerPad.Space}>Space</button>
+        <button onClick={controllerPad.KeyZ}>Z</button>
+        <button onClick={controllerPad.KeyX}>X</button>
+        <button onClick={controllerPad.KeyC}>C</button>
+        <button onClick={controllerPad.Enter}>Enter</button>
       </div>
     </Wrapper>
   );
