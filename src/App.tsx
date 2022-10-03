@@ -221,25 +221,25 @@ const tryWallKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: Curren
 
     if (isEmptyPosition(movedPiece, matrix)) {
       return movedPiece
-    } else {
-      if (isEmptyPosition(moveLeft(movedPiece), matrix)) {
-        return moveLeft(movedPiece)
-      }
+    } 
 
-      if (isEmptyPosition(moveRight(movedPiece), matrix)) {
-        return moveRight(movedPiece)
-      }
-
-      if (isEmptyPosition(moveUp(movedPiece), matrix)) {
-        return moveUp(movedPiece)
-      }
-
-      if (isEmptyPosition(moveUp(moveUp(movedPiece)), matrix)) {
-        return moveUp(moveUp(movedPiece))
-      }
-
-      return currentPiece
+    if (isEmptyPosition(moveLeft(movedPiece), matrix)) {
+      return moveLeft(movedPiece)
     }
+
+    if (isEmptyPosition(moveRight(movedPiece), matrix)) {
+      return moveRight(movedPiece)
+    }
+
+    if (isEmptyPosition(moveUp(movedPiece), matrix)) {
+      return moveUp(movedPiece)
+    }
+
+    if (isEmptyPosition(moveUp(moveUp(movedPiece)), matrix)) {
+      return moveUp(moveUp(movedPiece))
+    }
+
+    return currentPiece
   }
 }
 
