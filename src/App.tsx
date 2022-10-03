@@ -197,6 +197,10 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean =>
 
 const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
   return (currentPiece, matrix) => {
+    if (!currentPiece) {
+      return currentPiece;
+    }
+
     const movedPiece = moveMethod(currentPiece)
 
     if (isEmptyPosition(movedPiece, matrix)) {
@@ -209,6 +213,10 @@ const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPie
 
 const tryWallKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
   return (currentPiece, matrix) => {
+    if (!currentPiece) {
+      return currentPiece;
+    }
+
     const movedPiece = moveMethod(currentPiece)
 
     if (isEmptyPosition(movedPiece, matrix)) {
