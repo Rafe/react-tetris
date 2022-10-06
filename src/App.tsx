@@ -580,8 +580,8 @@ const BoardContainer = styled.div`
 `
 
 const PreviewBoard = styled.div`
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
   margin: 10px;
 `
 
@@ -600,6 +600,44 @@ const GameStateOverlay = styled.div`
 const GameStateContainer = styled.div`
   color: #FFF;
   text-align: center;
+`
+
+const ControllerPad = styled.div`
+  display: flex;
+`
+
+const LeftPad = styled.div`
+  
+`
+
+const CenterPad = styled.div`
+  
+`
+
+const RightPad = styled.div`
+  
+`
+
+const Button = styled.button`
+  background-color: #5a64f1;
+  border: 1px solid #000;
+  border-radius: 50%;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+  width: 50px;
+  height: 50px;
+  text-aligh: center;
+  font-size: 12px;
+`
+
+const StartButton = styled.button`
+  background-color: #DDD;
+  border: 1px solid #000;
+  border-radius: 5px;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+  width: 50px;
+  height: 20px;
+  text-aligh: center;
+  font-size: 12px;
 `
 
 const Preview = ({ type }: { type: PieceType | null }) => {
@@ -700,17 +738,35 @@ function App() {
           <h5>score: {score}</h5>
         </div>
       </Container>
-      <div>
-        <button onClick={controllerPad.ArrowUp}>UP</button>
-        <button onClick={controllerPad.ArrowLeft}>LEFT</button>
-        <button onClick={controllerPad.ArrowRight}>RIGHT</button>
-        <button onClick={() => controllerPad.ArrowDown()}>DOWN</button>
-        <button onClick={controllerPad.Space}>Space</button>
-        <button onClick={controllerPad.KeyZ}>Z</button>
-        <button onClick={controllerPad.KeyX}>X</button>
-        <button onClick={controllerPad.KeyC}>C</button>
-        <button onClick={controllerPad.Enter}>Enter</button>
-      </div>
+      <ControllerPad>
+        <LeftPad>
+          <div>
+            <Button onClick={controllerPad.ArrowUp}>UP</Button>
+          </div>
+          <div>
+            <Button onClick={controllerPad.ArrowLeft}>LEFT</Button>
+            <Button onClick={controllerPad.ArrowRight}>RIGHT</Button>
+          </div>
+          <div>
+            <Button onClick={() => controllerPad.ArrowDown()}>DOWN</Button>
+          </div>
+        </LeftPad>
+        <CenterPad>
+          <StartButton onClick={controllerPad.Enter}>Enter</StartButton>
+        </CenterPad>
+        <RightPad>
+          <div>
+            <Button onClick={controllerPad.Space}>Drop</Button>
+          </div>
+          <div>
+            <Button onClick={controllerPad.KeyZ}>L</Button>
+            <Button onClick={controllerPad.KeyX}>R</Button>
+          </div>
+          <div>
+            <Button onClick={controllerPad.KeyC}>Hold</Button>
+          </div>
+        </RightPad>
+      </ControllerPad>
     </Wrapper>
   );
 }
