@@ -347,6 +347,8 @@ const initializeGame = () => ({
   shaken: false
 })
 
+const eventCallbacks: any = { ArrowLeft: [], ArrowRight: [] }
+
 const useGame = create<State>((set, get) => ({
   ...initializeGame(),
   gameLoop() {
@@ -512,13 +514,41 @@ const useGame = create<State>((set, get) => ({
         return
       }
 
+      if (eventCallbacks[event.code]?.length) {
+        return
+      }
+
       if (controller[event.code]) {
         controller[event.code]()
+      }
+
+      if (eventCallbacks[event.code]) {
+        const loop = (n: number, callbacks: any, next: any) => {
+          callbacks.push(setTimeout(() => {
+            if (controller[event.code]) {
+              controller[event.code]()
+            }
+            next(50, callbacks, next)
+          }, n))
+        }
+
+        loop(150, eventCallbacks[event.code], loop)
+      }
+    }
+
+    const eventRemover = (event: any) => {
+      if (eventCallbacks[event.code]) {
+        eventCallbacks[event.code].forEach(clearTimeout)
+        eventCallbacks[event.code] = []
       }
     }
 
     document.addEventListener("keydown", eventListener)
-    return () => document.removeEventListener("keydown", eventListener)
+    document.addEventListener("keyup", eventRemover)
+    return () => {
+      document.removeEventListener("keydown", eventListener)
+      document.removeEventListener("keyup", eventRemover)
+    }
   }
 }))
 
