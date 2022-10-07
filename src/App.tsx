@@ -574,15 +574,18 @@ const Container = styled.div`
   display: flex;
 `
 
+const SideContainer = styled.div`
+`
+
 const BoardContainer = styled.div`
   margin: 10px;
   position: relative;
 `
 
 const PreviewBoard = styled.div`
-  width: 90px;
-  height: 90px;
-  margin: 10px;
+  width: 85px;
+  height: 60px;
+  margin: 5px 0;
 `
 
 const GameStateOverlay = styled.div`
@@ -609,11 +612,12 @@ const ControllerPad = styled.div`
 const LeftPad = styled.div`
   display: flex;
   flex-direction: column;
-  
 `
 
 const CenterPad = styled.div`
-  
+  display: flex;
+  flex-direction: column;
+  margin: 20px 5px;
 `
 
 const RightPad = styled.div`
@@ -649,10 +653,11 @@ const StartButton = styled.button`
   border: 1px solid #000;
   border-radius: 5px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
-  width: 50px;
-  height: 20px;
+  padding: 0;
+  width: 35px;
+  height: 15px;
   text-aligh: center;
-  font-size: 12px;
+  font-size: 10px;
 `
 
 const Preview = ({ type }: { type: PieceType | null }) => {
@@ -703,10 +708,13 @@ function App() {
 
   return (
     <Wrapper>
-      <header>
-        <h2>React Tetris</h2>
-      </header>
       <Container>
+        <SideContainer>
+          <h5>hold</h5>
+          <PreviewBoard>
+            <Preview type={holdPieceType} />
+          </PreviewBoard>
+        </SideContainer>
         <BoardContainer>
           {gameState === GameState.GAME_OVER && (
             <GameStateOverlay>
@@ -740,18 +748,14 @@ function App() {
             </tbody>
           </MatrixTable>
         </BoardContainer>
-        <div>
-          <h5>next: </h5>
+        <SideContainer>
+          <h5>next</h5>
           <PreviewBoard>
             <Preview type={nextPieceType} />
           </PreviewBoard>
-          <h5>hold: </h5>
-          <PreviewBoard>
-            <Preview type={holdPieceType} />
-          </PreviewBoard>
           <h5>level: {level}</h5>
           <h5>score: {score}</h5>
-        </div>
+        </SideContainer>
       </Container>
       <ControllerPad>
         <LeftPad>
@@ -775,10 +779,10 @@ function App() {
           </CenterRow>
           <MiddleRow>
             <Button onClick={controllerPad.KeyZ}>L</Button>
-            <Button onClick={controllerPad.KeyX}>R</Button>
+            <Button onClick={controllerPad.KeyC}>Hold</Button>
           </MiddleRow>
           <CenterRow>
-            <Button onClick={controllerPad.KeyC}>Hold</Button>
+            <Button onClick={controllerPad.KeyX}>R</Button>
           </CenterRow>
         </RightPad>
       </ControllerPad>
