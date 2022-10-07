@@ -607,6 +607,8 @@ const ControllerPad = styled.div`
 `
 
 const LeftPad = styled.div`
+  display: flex;
+  flex-direction: column;
   
 `
 
@@ -615,8 +617,21 @@ const CenterPad = styled.div`
 `
 
 const RightPad = styled.div`
-  
+  display: flex;
+  flex-direction: column;
 `
+
+const CenterRow = styled.div`
+  width: 130px;
+  display: flex;
+  justify-content: center;
+`
+
+const MiddleRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
 
 const Button = styled.button`
   background-color: #5a64f1;
@@ -689,7 +704,7 @@ function App() {
   return (
     <Wrapper>
       <header>
-        <h1>React Tetris</h1>
+        <h2>React Tetris</h2>
       </header>
       <Container>
         <BoardContainer>
@@ -740,31 +755,31 @@ function App() {
       </Container>
       <ControllerPad>
         <LeftPad>
-          <div>
+          <CenterRow>
             <Button onClick={controllerPad.ArrowUp}>UP</Button>
-          </div>
-          <div>
+          </CenterRow>
+          <MiddleRow>
             <Button onClick={controllerPad.ArrowLeft}>LEFT</Button>
             <Button onClick={controllerPad.ArrowRight}>RIGHT</Button>
-          </div>
-          <div>
+          </MiddleRow>
+          <CenterRow>
             <Button onClick={() => controllerPad.ArrowDown()}>DOWN</Button>
-          </div>
+          </CenterRow>
         </LeftPad>
         <CenterPad>
           <StartButton onClick={controllerPad.Enter}>Enter</StartButton>
         </CenterPad>
         <RightPad>
-          <div>
+          <CenterRow>
             <Button onClick={controllerPad.Space}>Drop</Button>
-          </div>
-          <div>
+          </CenterRow>
+          <MiddleRow>
             <Button onClick={controllerPad.KeyZ}>L</Button>
             <Button onClick={controllerPad.KeyX}>R</Button>
-          </div>
-          <div>
+          </MiddleRow>
+          <CenterRow>
             <Button onClick={controllerPad.KeyC}>Hold</Button>
-          </div>
+          </CenterRow>
         </RightPad>
       </ControllerPad>
     </Wrapper>
