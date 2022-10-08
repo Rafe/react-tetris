@@ -598,11 +598,19 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
+  align-items: center;
+`
+
+const ContainerWrapper = styled.div`
+  display: flex;
+  flex: 1;
   align-items: center;
 `
 
 const Container = styled.div`
   display: flex;
+  flex: 1;
 `
 
 const SideContainer = styled.div`
@@ -638,6 +646,7 @@ const GameStateContainer = styled.div`
 
 const ControllerPad = styled.div`
   display: flex;
+  padding: 15px 15px 50px;
 `
 
 const LeftPad = styled.div`
@@ -743,56 +752,58 @@ function App() {
 
   return (
     <Wrapper>
-      <Container>
-        <SideContainer>
-          <h5>hold</h5>
-          <PreviewBoard>
-            <Preview type={holdPieceType} />
-          </PreviewBoard>
-        </SideContainer>
-        <BoardContainer>
-          {gameState === GameState.GAME_OVER && (
-            <GameStateOverlay>
-              <GameStateContainer>
-                <h1>Game Over</h1>
-                <p>Press "Enter" to restart</p>
-              </GameStateContainer>
-            </GameStateOverlay>
-          )}
-          {gameState === GameState.PAUSE && (
-            <GameStateOverlay>
-              <GameStateContainer>
-                <h1>Paused</h1>
-                <p>Press "Enter" to continue</p>
-              </GameStateContainer>
-            </GameStateOverlay>
-          )}
-          <MatrixTable shaken={shaken}>
-            <tbody>
-              {
-                viewMatrix().map((line, i) => (
-                  <tr key={`line-${i}`}>
-                    {
-                      line.map((type, j) => (
-                        <Block key={`block-${i}-${j}`} type={type} clear={linesToClear[i]} />
-                      ))
-                    }
-                  </tr>
-                ))
-              }
-            </tbody>
-          </MatrixTable>
-        </BoardContainer>
-        <SideContainer>
-          <h5>next</h5>
-          <PreviewBoard>
-            <Preview type={nextPieceType} />
-          </PreviewBoard>
-          <h5>level: {level}</h5>
-          <h5>score: {score}</h5>
-          <h5>line: {line}</h5>
-        </SideContainer>
-      </Container>
+      <ContainerWrapper>
+        <Container>
+          <SideContainer>
+            <p>HOLD</p>
+            <PreviewBoard>
+              <Preview type={holdPieceType} />
+            </PreviewBoard>
+          </SideContainer>
+          <BoardContainer>
+            {gameState === GameState.GAME_OVER && (
+              <GameStateOverlay>
+                <GameStateContainer>
+                  <h1>Game Over</h1>
+                  <p>Press "Enter" to restart</p>
+                </GameStateContainer>
+              </GameStateOverlay>
+            )}
+            {gameState === GameState.PAUSE && (
+              <GameStateOverlay>
+                <GameStateContainer>
+                  <h1>Paused</h1>
+                  <p>Press "Enter" to continue</p>
+                </GameStateContainer>
+              </GameStateOverlay>
+            )}
+            <MatrixTable shaken={shaken}>
+              <tbody>
+                {
+                  viewMatrix().map((line, i) => (
+                    <tr key={`line-${i}`}>
+                      {
+                        line.map((type, j) => (
+                          <Block key={`block-${i}-${j}`} type={type} clear={linesToClear[i]} />
+                        ))
+                      }
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </MatrixTable>
+          </BoardContainer>
+          <SideContainer>
+            <p>NEXT</p>
+            <PreviewBoard>
+              <Preview type={nextPieceType} />
+            </PreviewBoard>
+            <p>Level: {level}</p>
+            <p>Score: {score}</p>
+            <p>Line: {line}</p>
+          </SideContainer>
+        </Container>
+      </ContainerWrapper>
       <ControllerPad>
         <LeftPad>
           <CenterRow>
