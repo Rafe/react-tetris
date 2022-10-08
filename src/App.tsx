@@ -581,6 +581,14 @@ const Block = styled.td<{type: string, clear?: boolean}>`
   `}
 `
 
+const EmptyBlock = styled.td`
+  margin: 0;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border: 0px;
+`
+
 const MatrixTable = styled.table<{shaken?: boolean}>`
   border-collapse: collapse;
   transform: ${({shaken}) => shaken ? "translateY(5px)" : "none"};
@@ -697,7 +705,9 @@ const Preview = ({ type }: { type: PieceType | null }) => {
             <tr key={`preview-row-${i}`}>
               {
                 line.map((p, j) => (
-                  <Block key={`preview-block-${i}-${j}`} type={p ? type : ""} />
+                  p ?
+                    <Block key={`preview-block-${i}-${j}`} type={type} /> :
+                    <EmptyBlock />
                 ))
               }
             </tr>

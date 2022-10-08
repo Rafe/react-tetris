@@ -422,3 +422,7 @@
  [hidden] {
    display: none !important;
  }
+
+ body {
+   overflow: hidden;
+ }
