@@ -212,6 +212,10 @@ const tryWallKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: Curren
       return movedPiece
     } 
 
+    if (isEmptyPosition(moveDown(movedPiece), matrix)) {
+      return moveDown(movedPiece)
+    }
+
     if (isEmptyPosition(moveLeft(movedPiece), matrix)) {
       return moveLeft(movedPiece)
     }
