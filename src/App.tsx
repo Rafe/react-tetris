@@ -613,6 +613,18 @@ const Container = styled.div`
   flex: 1;
 `
 
+const Description = styled.div`
+  width: 100%;
+  height: 125px;
+  background-color: #EEE;
+  text-align: center;
+  padding-top: 30px;
+
+  @media only screen and (max-width: 820px) {
+    display: none;
+  }
+`
+
 const SideContainer = styled.div`
 `
 
@@ -646,7 +658,21 @@ const GameStateContainer = styled.div`
 
 const ControllerPad = styled.div`
   display: flex;
+  position: relative;
   padding: 15px 15px 50px;
+`
+
+const HowTo = styled.div`
+  position: absolute;
+  left: -350px;
+  top: -50px;
+  padding: 25px;
+  background-color: #EEE;
+  border-radius: 25px;
+
+  @media only screen and (max-width: 820px) {
+    display: none;
+  }
 `
 
 const LeftPad = styled.div`
@@ -752,6 +778,11 @@ function App() {
 
   return (
     <Wrapper>
+      <Description>
+        <h3>React-Tetris</h3>
+        <iframe src="https://ghbtns.com/github-btn.html?user=rafe&repo=react-tetris&type=star&count=true&size=large" frameBorder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=rafetwbs&repo=react-tetris&type=fork&count=true&size=large" frameBorder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
+      </Description>
       <ContainerWrapper>
         <Container>
           <SideContainer>
@@ -805,6 +836,17 @@ function App() {
         </Container>
       </ContainerWrapper>
       <ControllerPad>
+        <HowTo>
+          <h5>Keyboard Control</h5>
+          <ul>
+            <li>Arrow key to control direction</li>
+            <li>Z: Rotate left</li>
+            <li>X: Rotate right</li>
+            <li>C: Hold</li>
+            <li>Space: Drop</li>
+            <li>Enter: Start/Pause</li>
+          </ul>
+        </HowTo>
         <LeftPad>
           <CenterRow>
             <Button onClick={controllerPad.ArrowUp}></Button>
