@@ -46,17 +46,6 @@ const BASE_SCORE_FOR_LINES = [0, 40, 100, 300, 1200]
 const MATRIX_WIDTH = 10
 const MATRIX_HEIGHT = 20
 
-// when game state is GAME_OVER or PAUSE, press enter to start the game
-// when game state is START, running game loop 
-//   the current piece fall by game speed
-//   when falling, show the future position that the piece will fall
-//   when piece can not move when fall, lock piece
-//   when piece fill the line, remove the line, stop fall for a tick, add score based on speed and line removed
-//   when line over the threshold increase speed level
-//   then pop next piece from queue, when there is no space for piece, set game state to GAME_OVER
-//   while falling, controller take control of the piece
-//     left, right, down, drop, rotate right, rotate left, pause
-
 const generatePiece = (type: PieceType): Piece => {
   switch(type) {
     case "I":
@@ -347,7 +336,7 @@ const initializeGame = () => ({
   shaken: false
 })
 
-const eventCallbacks: any = { ArrowLeft: [], ArrowRight: [] }
+const eventCallbacks: any = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
 
 const useGame = create<State>((set, get) => ({
   ...initializeGame(),
@@ -672,6 +661,7 @@ const Button = styled.button`
   border: 1px solid #000;
   border-radius: 50%;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+  color: white;
   width: 50px;
   height: 50px;
   text-aligh: center;
@@ -723,6 +713,7 @@ function App() {
     gameState,
     holdPieceType,
     level,
+    line,
     nextPieceType,
     score,
     viewMatrix,
@@ -785,19 +776,20 @@ function App() {
           </PreviewBoard>
           <h5>level: {level}</h5>
           <h5>score: {score}</h5>
+          <h5>line: {line}</h5>
         </SideContainer>
       </Container>
       <ControllerPad>
         <LeftPad>
           <CenterRow>
-            <Button onClick={controllerPad.ArrowUp}>UP</Button>
+            <Button onClick={controllerPad.ArrowUp}></Button>
           </CenterRow>
           <MiddleRow>
-            <Button onClick={controllerPad.ArrowLeft}>LEFT</Button>
-            <Button onClick={controllerPad.ArrowRight}>RIGHT</Button>
+            <Button onClick={controllerPad.ArrowLeft} />
+            <Button onClick={controllerPad.ArrowRight} />
           </MiddleRow>
           <CenterRow>
-            <Button onClick={() => controllerPad.ArrowDown()}>DOWN</Button>
+            <Button onClick={() => controllerPad.ArrowDown()} />
           </CenterRow>
         </LeftPad>
         <CenterPad>
