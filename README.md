@@ -1,6 +1,6 @@
 # React Tetris
 
-A React implementation for Tetris, using (Zustand)[https://github.com/pmndrs/zustand] for state management.
+A React implementation for Tetris, using [Zustand](https://github.com/pmndrs/zustand) for state management.
 
 # Application logic
 
