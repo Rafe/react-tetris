@@ -1,5 +1,6 @@
 {
   "name": "react-tetris",
+  "homepage": "http://neethack.com/react-tetris",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
