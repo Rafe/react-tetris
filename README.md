@@ -4,6 +4,7 @@ A React implementation for Tetris, using (Zustand)[https://github.com/pmndrs/zus
 
 # Application logic
 
+```
 A game has 7 types of Tetrimino: I, L, J, Z, S, O, T.
   show board that contains 20 * 10 Blocks.
   show the current moving piece that is controlled by player.
@@ -68,3 +69,4 @@ when game state is START
       or cancel rotate
   when the current piece is blocked at the top
     save the game state to Game Over
+```
