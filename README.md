@@ -1,46 +1,70 @@
-# Getting Started with Create React App
+# React Tetris
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React implementation for Tetris, using (Zustand)[https://github.com/pmndrs/zustand] for state management.
 
-## Available Scripts
+# Application logic
 
-In the project directory, you can run:
+A game has 7 types of Tetrimino: I, L, J, Z, S, O, T.
+  show board that contains 20 * 10 Blocks.
+  show the current moving piece that is controlled by player.
+  show the future position when the current piece will drop
+  show the next piece, the piece that is hold
+  show the score, level and line
 
-### `yarn start`
+when game state is GAME_OVER or PAUSE
+  press enter to start the game
+when game state is START
+  for every tick (0.8 - (level - 1) * 0.007) ** (level - 1) second
+    the current piece move down
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+  when piece move down
+    if the piece can move
+      move current piece one block down
+    if the piece is blocked
+      add the tick to current tick time of the piece
+      if tick time > 0.5 sec, total time > 5 sec
+        add the current piece to board
+        clear the line that is full
+        add the line cleared to total lines
+        add score by [40, 100, 300, 1200] for each line cleared
+        add the level for every 20 lines cleared
+        play the clear animation for 0.4 sec
+        create new current piece from next piece
+        create new next piece
+  when piece move left
+    if the piece can move
+      move current piece one block left
+      reset current piece tick time
+  when piece move right
+    if the piece can move
+      move current piece one block right
+      reset current piece tick time
+  when piece hold
+    if the hold piece exists
+      switch the hold piece with current piece
+      lock the piece hold until next current piece
+    if the hold piece not exists
+      put the current piece to hold
+      create the new current piece
+      create the new next piece
+  when piece drop
+    move the piece to the bottom of board
+    play the shaken animation
+    add the current piece to board
+    clear the line that is full
+    add the line cleared to total lines
+    add score by [40, 100, 300, 1200] for each line cleared
+    add the level for every 20 lines cleared
+    play the clear animation for 0.4 sec
+    create new current piece from next piece
+    create new next piece
+  when piece rotate
+    move the current piece clockwise/counter clockwise by pivot
+    if the piece is blocked
+      try to move one block down
+      or try to move one block right
+      or try to move one block left
+      or try to move two block up
+      or cancel rotate
+  when the current piece is blocked at the top
+    save the game state to Game Over
