@@ -683,7 +683,7 @@ const LeftPad = styled.div`
 const CenterPad = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 20px 5px;
+  margin: 10px 0;
 `
 
 const RightPad = styled.div`
@@ -692,7 +692,7 @@ const RightPad = styled.div`
 `
 
 const CenterRow = styled.div`
-  width: 130px;
+  width: 165px;
   display: flex;
   justify-content: center;
 `
@@ -702,15 +702,14 @@ const MiddleRow = styled.div`
   justify-content: space-between;
 `
 
-
 const Button = styled.button`
   background-color: #5a64f1;
   border: 1px solid #000;
   border-radius: 50%;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
   color: white;
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
   text-aligh: center;
   font-size: 12px;
 `
@@ -721,8 +720,8 @@ const StartButton = styled.button`
   border-radius: 5px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
   padding: 0;
-  width: 35px;
-  height: 15px;
+  width: 50px;
+  height: 20px;
   text-aligh: center;
   font-size: 10px;
 `
