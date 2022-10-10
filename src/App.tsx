@@ -615,10 +615,9 @@ const Container = styled.div`
 
 const Description = styled.div`
   width: 100%;
-  height: 125px;
   background-color: #EEE;
   text-align: center;
-  padding-top: 30px;
+  padding-top: 15px;
 
   @media only screen and (max-width: 820px) {
     display: none;
@@ -720,7 +719,7 @@ const StartButton = styled.button`
   border-radius: 5px;
   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
   padding: 0;
-  width: 50px;
+  width: 40px;
   height: 20px;
   text-aligh: center;
   font-size: 10px;
