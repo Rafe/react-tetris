@@ -392,7 +392,7 @@ const useGame = create<State>((set, get) => ({
         };
       }
 
-      if (!isHardDrop && currentPiece.tick < 0.5 && currentPiece.totalTick < 5) {
+      if (!isHardDrop && currentPiece.tick < 0.4 && currentPiece.totalTick < 4) {
         const tickSeconds = getTickSeconds(level)
         return {
           currentPiece: {

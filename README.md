@@ -23,7 +23,7 @@ when game state is START
       move current piece one block down
     if the piece is blocked
       add the tick to current tick time of the piece
-      if tick time > 0.5 sec, total time > 5 sec
+      if tick time > 0.4 sec or total time > 4 sec
         add the current piece to board
         clear the line that is full
         add the line cleared to total lines
