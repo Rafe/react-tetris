@@ -35,7 +35,7 @@ interface State {
   linesToClear: boolean[]
   holdLocked: boolean
   shaken: boolean
-  currentPiece: CurrentPiece
+  currentPiece: CurrentPiece | null
 
   gameLoop: () => () => void
   viewMatrix: () => Matrix
@@ -184,7 +184,7 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean =>
   return true
 }
 
-const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
+const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece | null, m: Matrix) => CurrentPiece | null) => {
   return (currentPiece, matrix) => {
     if (!currentPiece) {
       return currentPiece;
@@ -200,7 +200,7 @@ const tryMove = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPie
   }
 }
 
-const tryWallKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece, m: Matrix) => CurrentPiece) => {
+const tryWallKick = (moveMethod: (c: CurrentPiece) => CurrentPiece): ((c: CurrentPiece | null, m: Matrix) => CurrentPiece | null) => {
   return (currentPiece, matrix) => {
     if (!currentPiece) {
       return currentPiece;
@@ -271,10 +271,10 @@ const rotate = ({ clockwise }: { clockwise: boolean}) => (currentPiece: CurrentP
   }
 }
 
-const rotateRight = (currentPiece: CurrentPiece, matrix: Matrix) =>
+const rotateRight = (currentPiece: CurrentPiece | null, matrix: Matrix) =>
   tryWallKick(rotate({ clockwise: true }))(currentPiece, matrix)
 
-const rotateLeft = (currentPiece: CurrentPiece, matrix: Matrix) =>
+const rotateLeft = (currentPiece: CurrentPiece | null, matrix: Matrix) =>
   tryWallKick(rotate({ clockwise: false }))(currentPiece, matrix)
 
 const addPieceTo = (matrix: Matrix, currentPiece: CurrentPiece): Matrix => {
@@ -340,7 +340,7 @@ const initializeGame = () => ({
   shaken: false
 })
 
-const repeatingEvents: any = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
+const repeatingEvents: { [key: string]: any[] } = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
 
 const pressButton = (eventCode: string, controller: any, delay = 150) => {
   if (controller[eventCode]) {
@@ -446,6 +446,10 @@ const useGame = create<State>((set, get) => ({
 
       const movedPiece = isHardDrop ? hardDrop(currentPiece, matrix) : tryMove(moveDown)(currentPiece, matrix)
 
+      if (!movedPiece) {
+        return {}
+      }
+
       if (!isHardDrop && !isSamePosition(currentPiece, movedPiece)) {
         return {
           currentPiece: movedPiece,
@@ -463,7 +467,7 @@ const useGame = create<State>((set, get) => ({
         }
       }
 
-      let animation: any = {}
+      const animation: { shaken: boolean } = { shaken: false }
       if (isHardDrop) {
         animation["shaken"] = true
         setTimeout(() => {
@@ -524,7 +528,7 @@ const useGame = create<State>((set, get) => ({
     },
     KeyC: () => {
       set(({ currentPiece, holdPieceType, nextPieceType, holdLocked }) => {
-        if (holdLocked) {
+        if (holdLocked || !currentPiece) {
           return {}
         }
 
