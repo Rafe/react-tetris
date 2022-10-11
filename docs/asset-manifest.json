@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/react-tetris/static/css/main.90c17a72.css",
-    "main.js": "/react-tetris/static/js/main.ba9b5941.js",
+    "main.css": "/react-tetris/static/css/main.23599861.css",
+    "main.js": "/react-tetris/static/js/main.54361200.js",
     "index.html": "/react-tetris/index.html",
-    "main.90c17a72.css.map": "/react-tetris/static/css/main.90c17a72.css.map",
-    "main.ba9b5941.js.map": "/react-tetris/static/js/main.ba9b5941.js.map"
+    "main.23599861.css.map": "/react-tetris/static/css/main.23599861.css.map",
+    "main.54361200.js.map": "/react-tetris/static/js/main.54361200.js.map"
   },
   "entrypoints": [
-    "static/css/main.90c17a72.css",
-    "static/js/main.ba9b5941.js"
+    "static/css/main.23599861.css",
+    "static/js/main.54361200.js"
   ]
 }
