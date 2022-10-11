@@ -345,12 +345,12 @@ const repeatingEvents: any = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
 const pressButton = (eventCode: string, controller: any, delay = 150) => {
   if (controller[eventCode]) {
     controller[eventCode]()
-  }
 
-  if(repeatingEvents[eventCode]) {
-    repeatingEvents[eventCode].push(setTimeout(() => {
-      pressButton(eventCode, controller, 50);
-    }, delay))
+    if(repeatingEvents[eventCode]) {
+      repeatingEvents[eventCode].push(setTimeout(() => {
+        pressButton(eventCode, controller, 50);
+      }, delay))
+    }
   }
 }
 
@@ -358,6 +358,19 @@ const releaseButton = (eventCode: string) => {
   while (repeatingEvents[eventCode]?.length) {
     const ref = repeatingEvents[eventCode].pop()
     clearTimeout(ref)
+  }
+}
+
+const handleButtonEvents = (eventCode: string, controller: any): any => {
+  const down = () => pressButton(eventCode, controller)
+  const up = () => releaseButton(eventCode)
+
+  return {
+    onMouseDown: down,
+    onMouseUp: up,
+    onMouseOut: up,
+    onTouchStart: down,
+    onTouchEnd: up
   }
 }
 
@@ -847,11 +860,11 @@ function App() {
             <Button onClick={controllerPad.ArrowUp}></Button>
           </CenterRow>
           <MiddleRow>
-            <Button onClick={controllerPad.ArrowLeft} />
-            <Button onClick={controllerPad.ArrowRight} />
+            <Button {...handleButtonEvents("ArrowLeft", controllerPad)} />
+            <Button {...handleButtonEvents("ArrowRight", controllerPad)} />
           </MiddleRow>
           <CenterRow>
-            <Button onClick={() => controllerPad.ArrowDown()} />
+            <Button {...handleButtonEvents("ArrowDown", controllerPad)} />
           </CenterRow>
         </LeftPad>
         <CenterPad>
