@@ -740,7 +740,7 @@ const Preview = ({ type }: { type: PieceType | null }) => {
                 line.map((p, j) => (
                   p ?
                     <Block key={`preview-block-${i}-${j}`} type={type} /> :
-                    <EmptyBlock />
+                    <EmptyBlock key={`preview-block-${i}-${j}`} />
                 ))
               }
             </tr>
