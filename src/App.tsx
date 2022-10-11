@@ -361,16 +361,44 @@ const releaseButton = (eventCode: string) => {
   }
 }
 
+const touchStartEvents: { [key: string]: boolean } = {}
+const mouseDownEvents: { [key: string]: boolean } = {}
 const handleButtonEvents = (eventCode: string, controller: any): any => {
-  const down = () => pressButton(eventCode, controller)
-  const up = () => releaseButton(eventCode)
+  const onMouseDown = () => {
+    if (touchStartEvents[eventCode]) {
+      return
+    }
+
+    mouseDownEvents[eventCode] = true
+    pressButton(eventCode, controller)
+  }
+  const onMouseUp = () => {
+    if (touchStartEvents[eventCode]) {
+      touchStartEvents[eventCode] = false
+      return
+    }
+    releaseButton(eventCode)
+    mouseDownEvents[eventCode] = false
+  }
+  const onMouseOut = () => {
+    if (mouseDownEvents[eventCode]) {
+      releaseButton(eventCode)
+    }
+  }
+  const onTouchStart = () => {
+    touchStartEvents[eventCode] = true
+    pressButton(eventCode, controller)
+  }
+  const onTouchEnd = () => {
+    releaseButton(eventCode)
+  }
 
   return {
-    onMouseDown: down,
-    onMouseUp: up,
-    onMouseOut: up,
-    onTouchStart: down,
-    onTouchEnd: up
+    onMouseDown,
+    onMouseUp,
+    onMouseOut,
+    onTouchStart,
+    onTouchEnd
   }
 }
 
@@ -711,7 +739,7 @@ const MiddleRow = styled.div`
   justify-content: space-between;
 `
 
-const Button = styled.button`
+const Button = styled.button.attrs(() => ({ tabIndex: -1 }))`
   background-color: #5a64f1;
   border: 1px solid #000;
   border-radius: 50%;
@@ -723,7 +751,7 @@ const Button = styled.button`
   font-size: 12px;
 `
 
-const StartButton = styled.button`
+const StartButton = styled.button.attrs(() => ({ tabIndex: -1 }))`
   background-color: #DDD;
   border: 1px solid #000;
   border-radius: 5px;
