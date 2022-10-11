@@ -340,7 +340,26 @@ const initializeGame = () => ({
   shaken: false
 })
 
-const eventCallbacks: any = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
+const repeatingEvents: any = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
+
+const pressButton = (eventCode: string, controller: any, delay = 150) => {
+  if (controller[eventCode]) {
+    controller[eventCode]()
+  }
+
+  if(repeatingEvents[eventCode]) {
+    repeatingEvents[eventCode].push(setTimeout(() => {
+      pressButton(eventCode, controller, 50);
+    }, delay))
+  }
+}
+
+const releaseButton = (eventCode: string) => {
+  while (repeatingEvents[eventCode]?.length) {
+    const ref = repeatingEvents[eventCode].pop()
+    clearTimeout(ref)
+  }
+}
 
 const useGame = create<State>((set, get) => ({
   ...initializeGame(),
@@ -502,51 +521,16 @@ const useGame = create<State>((set, get) => ({
   bindController() {
     const { controller, gameState } = get();
 
-    [
-      "touchstart",
-      "touchend",
-      "gesturestart",
-      "mousedown"
-    ].forEach((eventName: string): void => {
-      document.addEventListener(eventName, event => {
-        if (event.preventDefault) {
-          event.preventDefault()
-        }
-      }, true)
-    })
-
     const eventListener = (event: any) => {
       if ([GameState.GAME_OVER, GameState.PAUSE].includes(gameState) && event.code !== "Enter") {
         return
       }
 
-      if (eventCallbacks[event.code]?.length) {
-        return
-      }
-
-      if (controller[event.code]) {
-        controller[event.code]()
-      }
-
-      if (eventCallbacks[event.code]) {
-        const loop = (n: number, callbacks: any, next: any) => {
-          callbacks.push(setTimeout(() => {
-            if (controller[event.code]) {
-              controller[event.code]()
-            }
-            next(50, callbacks, next)
-          }, n))
-        }
-
-        loop(150, eventCallbacks[event.code], loop)
-      }
+      pressButton(event.code, controller)
     }
 
     const eventRemover = (event: any) => {
-      if (eventCallbacks[event.code]) {
-        eventCallbacks[event.code].forEach(clearTimeout)
-        eventCallbacks[event.code] = []
-      }
+      releaseButton(event.code)
     }
 
     document.addEventListener("keydown", eventListener)
