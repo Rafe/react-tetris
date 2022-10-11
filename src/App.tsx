@@ -500,7 +500,20 @@ const useGame = create<State>((set, get) => ({
     }
   },
   bindController() {
-    const { controller, gameState } = get()
+    const { controller, gameState } = get();
+
+    [
+      "touchstart",
+      "touchend",
+      "gesturestart",
+      "mousedown"
+    ].forEach((eventName: string): void => {
+      document.addEventListener(eventName, event => {
+        if (event.preventDefault) {
+          event.preventDefault()
+        }
+      }, true)
+    })
 
     const eventListener = (event: any) => {
       if ([GameState.GAME_OVER, GameState.PAUSE].includes(gameState) && event.code !== "Enter") {
