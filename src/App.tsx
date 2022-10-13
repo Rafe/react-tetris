@@ -846,7 +846,7 @@ function App() {
       <Description>
         <h3>React-Tetris</h3>
         <iframe src="https://ghbtns.com/github-btn.html?user=rafe&repo=react-tetris&type=star&count=true&size=large" frameBorder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
-        <iframe src="https://ghbtns.com/github-btn.html?user=rafetwbs&repo=react-tetris&type=fork&count=true&size=large" frameBorder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=rafe&repo=react-tetris&type=fork&count=true&size=large" frameBorder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
       </Description>
       <ContainerWrapper>
         <Container>
