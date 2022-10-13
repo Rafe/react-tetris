@@ -172,12 +172,12 @@ const isEmptyPosition = (currentPiece: CurrentPiece, matrix: Matrix): boolean =>
 
   for(let x = 0; x < piece.length; x++) {
     for(let y = 0; y < piece[0].length; y++) {
-      const px = position[0] + x
-      const py = position[1] + y
-
       if (!piece[x][y]) {
         continue
       }
+
+      const px = position[0] + x
+      const py = position[1] + y
 
       if (px >= MATRIX_HEIGHT) {
         return false
@@ -781,6 +781,17 @@ const StartButton = styled.button.attrs(() => ({ tabIndex: -1 }))`
   font-size: 10px;
 `
 
+const Arrow = styled.div<{degree?: number}>`
+  width: 0; 
+  height: 0; 
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  display: inline-block;
+  
+  border-bottom: 15px solid white;
+  rotate: ${(props) => props.degree || 0}deg
+`
+
 const Preview = ({ type }: { type: PieceType | null }) => {
   if (!type) {
     return null
@@ -903,14 +914,22 @@ function App() {
         </HowTo>
         <LeftPad>
           <CenterRow>
-            <Button onClick={controllerPad.ArrowUp}></Button>
+            <Button onClick={controllerPad.ArrowUp}>
+              <Arrow />
+            </Button>
           </CenterRow>
           <MiddleRow>
-            <Button {...handleButtonEvents("ArrowLeft", controllerPad)} />
-            <Button {...handleButtonEvents("ArrowRight", controllerPad)} />
+            <Button {...handleButtonEvents("ArrowLeft", controllerPad)}>
+              <Arrow degree={270} />
+            </Button>
+            <Button {...handleButtonEvents("ArrowRight", controllerPad)}>
+              <Arrow degree={90} />
+            </Button>
           </MiddleRow>
           <CenterRow>
-            <Button {...handleButtonEvents("ArrowDown", controllerPad)} />
+            <Button {...handleButtonEvents("ArrowDown", controllerPad)}>
+              <Arrow degree={180} />
+            </Button>
           </CenterRow>
         </LeftPad>
         <CenterPad>
