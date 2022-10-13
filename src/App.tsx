@@ -378,6 +378,13 @@ const releaseButton = (eventCode: string) => {
 const touchStartEvents: { [key: string]: boolean } = {}
 const mouseDownEvents: { [key: string]: boolean } = {}
 const handleButtonEvents = (eventCode: string, controller: any): ButtonEvents => {
+  const onTouchStart = () => {
+    touchStartEvents[eventCode] = true
+    pressButton(eventCode, controller)
+  }
+  const onTouchEnd = () => {
+    releaseButton(eventCode)
+  }
   const onMouseDown = () => {
     if (touchStartEvents[eventCode]) {
       return
@@ -399,20 +406,13 @@ const handleButtonEvents = (eventCode: string, controller: any): ButtonEvents =>
       releaseButton(eventCode)
     }
   }
-  const onTouchStart = () => {
-    touchStartEvents[eventCode] = true
-    pressButton(eventCode, controller)
-  }
-  const onTouchEnd = () => {
-    releaseButton(eventCode)
-  }
 
   return {
+    onTouchStart,
+    onTouchEnd,
     onMouseDown,
     onMouseUp,
-    onMouseOut,
-    onTouchStart,
-    onTouchEnd
+    onMouseOut
   }
 }
 
