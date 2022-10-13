@@ -69,4 +69,8 @@ when game state is START
       or cancel rotate
   when the current piece is blocked at the top
     save the game state to Game Over
+  when the arrow key ArrowLeft, ArrowDown, ArrowRight is pressed
+    overwrite original input
+    when key pressed repeat key after 0.15s in 0.05s interval
+    when key released, stop the repeat key
 ```
