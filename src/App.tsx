@@ -27,7 +27,7 @@ interface State {
   line: number
   score: number
   controller: any
-  bindController: () => void
+  bindKeyboardWithController: () => void
 
   matrix: Matrix
   nextPieceType: PieceType
@@ -577,10 +577,10 @@ const useGame = create<State>((set, get) => ({
       })
     }
   },
-  bindController() {
+  bindKeyboardWithController() {
     const { controller, gameState } = get();
 
-    const eventListener = (event: any) => {
+    const eventListener = (event: KeyboardEvent) => {
       if ([GameState.GAME_OVER, GameState.PAUSE].includes(gameState) && event.code !== "Enter") {
         return
       }
@@ -588,7 +588,7 @@ const useGame = create<State>((set, get) => ({
       pressButton(event.code, controller)
     }
 
-    const eventRemover = (event: any) => {
+    const eventRemover = (event: KeyboardEvent) => {
       releaseButton(event.code)
     }
 
@@ -809,7 +809,7 @@ const Preview = ({ type }: { type: PieceType | null }) => {
 
 function App() {
   const {
-    bindController,
+    bindKeyboardWithController,
     controller,
     linesToClear,
     gameLoop,
@@ -824,11 +824,11 @@ function App() {
   } = useGame(state => state , shallow)
 
   useEffect(gameLoop, [gameLoop, level])
-  useEffect(bindController)
+  useEffect(bindKeyboardWithController)
 
   const controllerPad = gameState === GameState.START ?
     controller :
-    { Enter: controller.Enter, ArrowDown: () => {} }
+    { Enter: controller.Enter }
 
   return (
     <Wrapper>
