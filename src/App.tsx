@@ -823,7 +823,7 @@ function App() {
     shaken
   } = useGame(state => state , shallow)
 
-  useEffect(gameLoop, [gameLoop, gameState, level])
+  useEffect(gameLoop, [gameLoop, level])
   useEffect(bindController)
 
   const controllerPad = gameState === GameState.START ?
