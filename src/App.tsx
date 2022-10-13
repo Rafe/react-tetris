@@ -41,6 +41,14 @@ interface State {
   viewMatrix: () => Matrix
 }
 
+interface ButtonEvents {
+  onTouchStart: () => void
+  onTouchEnd: () => void
+  onMouseDown: () => void
+  onMouseUp: () => void
+  onMouseOut: () => void
+}
+
 const LINES_EACH_LEVEL = 20
 const BASE_SCORE_FOR_LINES = [0, 40, 100, 300, 1200]
 const MATRIX_WIDTH = 10
@@ -363,7 +371,7 @@ const releaseButton = (eventCode: string) => {
 
 const touchStartEvents: { [key: string]: boolean } = {}
 const mouseDownEvents: { [key: string]: boolean } = {}
-const handleButtonEvents = (eventCode: string, controller: any): any => {
+const handleButtonEvents = (eventCode: string, controller: any): ButtonEvents => {
   const onMouseDown = () => {
     if (touchStartEvents[eventCode]) {
       return
