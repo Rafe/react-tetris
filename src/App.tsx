@@ -350,15 +350,21 @@ const initializeGame = () => ({
 
 const repeatingEvents: { [key: string]: any[] } = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
 
-const pressButton = (eventCode: string, controller: any, delay = 150) => {
-  if (controller[eventCode]) {
-    controller[eventCode]()
+const pressButton = (eventCode: string, controller: any, isLoop = false) => {
+  if (!controller[eventCode]) {
+    return
+  }
 
-    if(repeatingEvents[eventCode]) {
-      repeatingEvents[eventCode].push(setTimeout(() => {
-        pressButton(eventCode, controller, 50);
-      }, delay))
-    }
+  if (repeatingEvents[eventCode]?.length && !isLoop) {
+    return
+  }
+
+  controller[eventCode]()
+
+  if(repeatingEvents[eventCode]) {
+    repeatingEvents[eventCode].push(setTimeout(() => {
+      pressButton(eventCode, controller, true);
+    }, isLoop ? 50 : 150))
   }
 }
 
