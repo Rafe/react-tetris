@@ -333,21 +333,6 @@ const clearLines = (matrix: Matrix): [boolean[], Matrix] => {
   return [linesToClear, newMatrix]
 }
 
-const initializeGame = () => ({
-  gameState: GameState.START,
-  level: 1,
-  line: 0,
-  score: 0,
-
-  matrix: buildMatrix(),
-  currentPiece: createCurrentPiece(generatePieceType()),
-  nextPieceType: generatePieceType(),
-  linesToClear: new Array(MATRIX_WIDTH).fill(false),
-  holdPieceType: null,
-  holdLocked: false,
-  shaken: false
-})
-
 const repeatingEvents: { [key: string]: any[] } = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
 
 const pressButton = (eventCode: string, controller: any, isLoop = false) => {
@@ -416,6 +401,21 @@ const handleButtonEvents = (eventCode: string, controller: any): ButtonEvents =>
   }
 }
 
+const initializeGame = () => ({
+  gameState: GameState.START,
+  level: 1,
+  line: 0,
+  score: 0,
+
+  matrix: buildMatrix(),
+  currentPiece: createCurrentPiece(generatePieceType()),
+  nextPieceType: generatePieceType(),
+  linesToClear: new Array(MATRIX_WIDTH).fill(false),
+  holdPieceType: null,
+  holdLocked: false,
+  shaken: false
+})
+
 const useGame = create<State>((set, get) => ({
   ...initializeGame(),
   gameLoop() {
@@ -467,7 +467,7 @@ const useGame = create<State>((set, get) => ({
       if (!isHardDrop && !isSamePosition(currentPiece, movedPiece)) {
         return {
           currentPiece: movedPiece,
-        };
+        }
       }
 
       if (!isHardDrop && currentPiece.tick < 0.4 && currentPiece.totalTick < 4) {

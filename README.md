@@ -8,7 +8,7 @@ A React implementation for Tetris, using [Zustand](https://github.com/pmndrs/zus
 A game has 7 types of Tetrimino: I, L, J, Z, S, O, T.
   show board that contains 20 * 10 Blocks.
   show the current moving piece that is controlled by player.
-  show the future position when the current piece will drop
+  show the future position where the current piece will drop
   show the next piece, the piece that is hold
   show the score, level and line
 
