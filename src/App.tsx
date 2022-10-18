@@ -21,12 +21,36 @@ type CurrentPiece = {
   totalTick: number
 }
 
+interface Controller {
+  ArrowUp: () => void
+  ArrowDown: (isHardDrop?: boolean) => void
+  ArrowLeft: () => void
+  ArrowRight: () => void
+  KeyZ: () => void
+  KeyX: () => void
+  KeyC: () => void
+  Space: () => void
+  Enter: () => void
+}
+
+const EmptyController: Controller = {
+  ArrowUp: () => null,
+  ArrowDown: () => null,
+  ArrowLeft: () => null,
+  ArrowRight: () => null,
+  KeyZ: () => null,
+  KeyX: () => null,
+  KeyC: () => null,
+  Space: () => null,
+  Enter: () => null,
+}
+
 interface State {
   gameState: GameState
   level: number
   line: number
   score: number
-  controller: any
+  controller: Controller
   bindKeyboardWithController: () => void
 
   matrix: Matrix
@@ -335,8 +359,8 @@ const clearLines = (matrix: Matrix): [boolean[], Matrix] => {
 
 const repeatingEvents: { [key: string]: any[] } = { ArrowLeft: [], ArrowRight: [], ArrowDown: [] }
 
-const pressButton = (eventCode: string, controller: any, isLoop = false) => {
-  if (!controller[eventCode]) {
+const pressButton = (eventCode: string, controller: Controller, isLoop = false) => {
+  if (!controller[eventCode as keyof Controller]) {
     return
   }
 
@@ -344,7 +368,7 @@ const pressButton = (eventCode: string, controller: any, isLoop = false) => {
     return
   }
 
-  controller[eventCode]()
+  controller[eventCode as keyof Controller]()
 
   if(repeatingEvents[eventCode]) {
     repeatingEvents[eventCode].push(setTimeout(() => {
@@ -362,7 +386,7 @@ const releaseButton = (eventCode: string) => {
 
 const touchStartEvents: { [key: string]: boolean } = {}
 const mouseDownEvents: { [key: string]: boolean } = {}
-const handleButtonEvents = (eventCode: string, controller: any): ButtonEvents => {
+const handleButtonEvents = (eventCode: string, controller: Controller): ButtonEvents => {
   const onTouchStart = () => {
     touchStartEvents[eventCode] = true
     pressButton(eventCode, controller)
@@ -837,9 +861,9 @@ function App() {
   useEffect(gameLoop, [gameLoop, level])
   useEffect(bindKeyboardWithController)
 
-  const controllerPad = gameState === GameState.START ?
+  const controllerPad: Controller = gameState === GameState.START ?
     controller :
-    { Enter: controller.Enter }
+    { ...EmptyController, Enter: controller.Enter }
 
   return (
     <Wrapper>
